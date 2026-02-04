@@ -1,0 +1,59 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "PersianBits Voting Centre";
+}
+
+@*
+    LANDING PAGE (PUBLIC)
+    ---------------------
+    First page everyone sees.
+
+    Two actions only:
+    - Login
+    - Create account (Register)
+
+    IMPORTANT:
+    - These are <a asp-page="..."> links, not buttons.
+    - Links always work in frontend-only mode.
+*@
+
+<section class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-xl text-center space-y-8">
+
+        <!-- Title -->
+        <div class="space-y-3">
+            <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight">
+                PersianBits Voting Centre
+            </h1>
+            <p class="text-slate-400">
+                Simple voting for users. Powerful control for creators.
+            </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- LOGIN -->
+            <a asp-page="/Auth/Login"
+               class="block px-5 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-semibold
+                      shadow-[0_0_30px_rgba(99,102,241,0.35)] transition">
+                Login
+            </a>
+
+            <!-- CREATE ACCOUNT -->
+            <a asp-page="/Auth/Register/Index"
+               class="block px-5 py-4 rounded-2xl border border-indigo-500/60 text-indigo-200
+                      hover:bg-indigo-500/10 transition
+                      shadow-[0_0_25px_rgba(99,102,241,0.22)]">
+                Create account
+            </a>
+
+        </div>
+
+        <p class="text-s text-slate-500">
+            Mamad havasesh be shoma hast.
+        </p>
+
+    </div>
+</section>

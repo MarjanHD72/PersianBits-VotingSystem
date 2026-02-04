@@ -1,0 +1,160 @@
+﻿@page
+@model VotingSystem.Frontend.Pages.Admin.UsersModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+@*
+    USERS (Admin) - Frontend Only
+    -----------------------------
+    Purpose:
+    - Admin can view users and basic info.
+    - Later backend will:
+        - Load users from DB
+        - Support searching/filtering
+        - Allow enable/disable users
+        - View full user profile and activity
+        - Show creator verification status
+*@
+
+<section class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4">
+        <div class="space-y-1">
+            <h1 class="text-2xl font-semibold">Users</h1>
+            <p class="text-slate-400">Manage voters and creators. Frontend prototype (mock data).</p>
+        </div>
+
+        <a asp-page="/Admin/Dashboard"
+           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
+            Back
+        </a>
+    </div>
+
+    <!-- Search + filters (UI only) -->
+    <div class="grid md:grid-cols-3 gap-3">
+        <input class="md:col-span-2 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               placeholder="Search by name, username, email..." />
+
+        <select class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>All users</option>
+            <option>Creators</option>
+            <option>Normal users</option>
+            <option>Pending verification</option>
+            <option>Disabled</option>
+        </select>
+    </div>
+
+    <!-- Users list -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
+        <div class="px-5 py-4 flex items-center justify-between">
+            <h2 class="font-semibold">User List</h2>
+            <span class="text-xs text-slate-400">Mock data</span>
+        </div>
+
+        <div class="divide-y divide-slate-800">
+
+            <!-- User row -->
+            <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
+                        <span class="text-indigo-300 font-semibold">M</span>
+                    </div>
+                    <div>
+                        <p class="font-medium">Mamad Saberi <span class="text-slate-400 text-sm">@@mamad</span></p>
+                        <p class="text-sm text-slate-400">mamad@example.com</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
+                        Active
+                    </span>
+                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">
+                        Creator
+                    </span>
+
+                    <a asp-page="/Admin/UserDetails"
+                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        View
+                    </a>
+                    <button type="button"
+                            class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
+                        Disable
+                    </button>
+                </div>
+            </div>
+
+            <!-- User row -->
+            <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center">
+                        <span class="text-slate-200 font-semibold">S</span>
+                    </div>
+                    <div>
+                        <p class="font-medium">Sara Mohammadi <span class="text-slate-400 text-sm">@@sara_m</span></p>
+                        <p class="text-sm text-slate-400">sara@example.com</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
+                        Active
+                    </span>
+                    <span class="text-xs px-2 py-1 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30">
+                        User
+                    </span>
+
+                    <a asp-page="/Admin/UserDetails"
+                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        View
+                    </a>
+                    <button type="button"
+                            class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
+                        Disable
+                    </button>
+                </div>
+            </div>
+
+            <!-- User row (pending verification) -->
+            <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center">
+                        <span class="text-amber-300 font-semibold">A</span>
+                    </div>
+                    <div>
+                        <p class="font-medium">Ali Rezaei <span class="text-slate-400 text-sm">@@ali_r</span></p>
+                        <p class="text-sm text-slate-400">ali@example.com</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
+                        Pending verification
+                    </span>
+                    <span class="text-xs px-2 py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">
+                        Creator request
+                    </span>
+
+                    <a asp-page="/Admin/UserDetails"
+                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        View
+                    </a>
+                    <button type="button"
+                            class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium text-sm">
+                        Approve
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <p class="text-xs text-slate-500">
+        Backend later: search, pagination, real actions (disable/approve), and audit logs.
+    </p>
+
+</section>
