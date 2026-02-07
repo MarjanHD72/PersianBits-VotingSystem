@@ -1,0 +1,56 @@
+﻿@page
+@model VotingSystem.Frontend.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+@*
+    FRONTEND-ONLY LOGIN SCREEN
+    --------------------------
+    This is a placeholder page so the UI flow works.
+
+    Later (backend):
+    - Replace with real login (Identity/JWT/session)
+    - Validate user credentials
+    - Check role (Admin/User)
+    - Redirect to the correct dashboard
+*@
+
+<section class="max-w-xl mx-auto space-y-6">
+    <div class="text-center">
+        <h1 class="text-3xl font-semibold">PersianBits Voting System</h1>
+        <p class="text-slate-400 mt-2">Sign in to continue</p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-5">
+        <label class="block">
+            <span class="text-sm text-slate-300">Email</span>
+            <input class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="name@example.com" />
+        </label>
+
+        <label class="block">
+            <span class="text-sm text-slate-300">Password</span>
+            <input type="password"
+                   class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="••••••••" />
+        </label>
+
+        @* TEMP buttons just to test the routing flow *@
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <a asp-page="/Admin/Dashboard"
+               class="px-4 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium text-center">
+                Sign in as Admin
+            </a>
+
+            <a asp-page="/User/Dashboard"
+               class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60 font-medium text-center">
+                Sign in as User
+            </a>
+        </div>
+
+        <p class="text-xs text-slate-400 pt-2">
+            Prototype only: backend will replace these buttons with real authentication + role redirect.
+        </p>
+    </div>
+</section>

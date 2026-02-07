@@ -1,0 +1,88 @@
+﻿@page
+@model VotingSystem.Frontend.Pages.Auth.Register.UserModel
+@{
+    ViewData["Title"] = "User Registration";
+}
+
+@*
+    USER REGISTRATION (Frontend only)
+    Fields required (your request):
+    - Full name
+    - Email
+    - Password
+    - Confirm password
+
+    Backend later:
+    - Validate email uniqueness
+    - Hash password
+    - Create user role = "User"
+*@
+
+<section class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-xl space-y-6">
+
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-semibold">User Registration</h1>
+            <p class="text-slate-400">Simple registration for voters.</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-4">
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Full name</span>
+                <input class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                           focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="e.g. Mohammad Saberi"
+                       required />
+                <span class="text-xs text-slate-500">Use your real name (backend can enforce later).</span>
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Email</span>
+                <input type="email"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="name@example.com"
+                       required />
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Password</span>
+                <input type="password"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="••••••••"
+                       minlength="8"
+                       required />
+                <span class="text-xs text-slate-500">Minimum 8 characters recommended.</span>
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Confirm password</span>
+                <input type="password"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="••••••••"
+                       required />
+            </label>
+
+            <div class="pt-2 space-y-3">
+                @* Frontend-only: navigate to Login after "registering" *@
+                <a asp-page="/Auth/Login"
+                   class="w-full px-4 py-3 rounded-xl font-medium bg-indigo-500 hover:bg-indigo-400 text-slate-950
+                          shadow-[0_0_25px_rgba(99,102,241,0.35)] text-center block">
+                    Create account
+                </a>
+
+                <a asp-page="/Auth/Register/Index"
+                   class="block text-center text-sm text-slate-400 hover:text-slate-200">
+                    Back
+                </a>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-500 text-center">
+            Prototype: backend will actually save the user.
+        </p>
+    </div>
+</section>

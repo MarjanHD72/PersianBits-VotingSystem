@@ -1,0 +1,26 @@
+﻿@page
+@model VotingSystem.Frontend.Pages.Poll.ThanksModel
+@{
+    ViewData["Title"] = "Thank you";
+}
+
+@*
+    THANK YOU PAGE (Frontend Only)
+    ------------------------------
+    Later backend:
+    - Confirm submission saved
+    - Show receipt / participation ID if needed
+*@
+
+<section class="min-h-[70vh] flex items-center justify-center">
+    <div class="max-w-xl text-center space-y-4">
+        <h1 class="text-3xl font-semibold">Thank you!</h1>
+        <p class="text-slate-400">Your answers have been submitted.</p>
+
+        <a asp-page="/User/Dashboard"
+           class="inline-flex px-5 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium
+                  shadow-[0_0_25px_rgba(99,102,241,0.35)]">
+            Back to Dashboard
+        </a>
+    </div>
+</section>

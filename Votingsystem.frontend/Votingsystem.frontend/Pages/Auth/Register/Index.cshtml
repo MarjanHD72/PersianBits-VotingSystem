@@ -1,0 +1,65 @@
+﻿@page
+@model VotingSystem.Frontend.Pages.Auth.Register.IndexModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+@*
+    REGISTER CHOICE PAGE
+    --------------------
+    User chooses what type of account they want:
+    1) Creator (admin dashboard access later)
+    2) User (simple voter account)
+*@
+
+<section class="min-h-[70vh] flex items-center justify-center">
+    <div class="w-full max-w-2xl space-y-8">
+
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-semibold">Create your account</h1>
+            <p class="text-slate-400">Choose the type of registration.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <a asp-page="/Auth/Register/User"
+               class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 hover:bg-slate-900/70 transition text-left">
+                <p class="text-sm text-slate-400">Simple registration</p>
+                <h2 class="text-xl font-semibold mt-1">User</h2>
+                <p class="text-sm text-slate-400 mt-2">Email, username, password.</p>
+
+                <div class="mt-5">
+                    <span class="inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium
+                                 bg-indigo-500 text-slate-950
+                                 group-hover:bg-indigo-400 transition
+                                 shadow-[0_0_25px_rgba(99,102,241,0.35)]">
+                        Register as User
+                    </span>
+                </div>
+            </a>
+
+            <a asp-page="/Auth/Register/Creator"
+               class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 hover:bg-slate-900/70 transition text-left">
+                <p class="text-sm text-slate-400">More validation</p>
+                <h2 class="text-xl font-semibold mt-1">Creator</h2>
+                <p class="text-sm text-slate-400 mt-2">For poll creators (admin access later).</p>
+
+                <div class="mt-5">
+                    <span class="inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium
+                                 border border-indigo-500/60 text-indigo-300
+                                 group-hover:bg-indigo-500/10 transition
+                                 shadow-[0_0_25px_rgba(99,102,241,0.22)]">
+                        Register as Creator
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+        <div class="text-center">
+            <a asp-page="/Auth/Login" class="text-sm text-indigo-300 hover:text-indigo-200">
+                Already have an account? Login
+            </a>
+        </div>
+    </div>
+</section>

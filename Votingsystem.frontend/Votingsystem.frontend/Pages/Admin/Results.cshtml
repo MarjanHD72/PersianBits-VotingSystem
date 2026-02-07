@@ -1,0 +1,79 @@
+﻿@page
+@model VotingSystem.Frontend.Pages.Admin.ResultsModel
+@{
+    ViewData["Title"] = "Results";
+}
+
+<section class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-semibold">Results</h1>
+            <p class="text-slate-400 mt-1">Frontend prototype. Backend will load real results later.</p>
+        </div>
+
+        <a asp-page="/Admin/Dashboard"
+           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
+            Back
+        </a>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-5">
+        <h2 class="text-lg font-semibold">Event Feedback</h2>
+
+        <div class="space-y-3">
+            <div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">5 Stars</span>
+                    <span class="text-slate-400">42%</span>
+                </div>
+                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-3 w-[42%] bg-indigo-500"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">4 Stars</span>
+                    <span class="text-slate-400">31%</span>
+                </div>
+                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-3 w-[31%] bg-indigo-500"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">3 Stars</span>
+                    <span class="text-slate-400">17%</span>
+                </div>
+                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-3 w-[17%] bg-indigo-500"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">2 Stars</span>
+                    <span class="text-slate-400">7%</span>
+                </div>
+                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-3 w-[7%] bg-indigo-500"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">1 Star</span>
+                    <span class="text-slate-400">3%</span>
+                </div>
+                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-3 w-[3%] bg-indigo-500"></div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-500">
+            Later: this page will show real-time updates and export options.
+        </p>
+    </div>
+</section>
