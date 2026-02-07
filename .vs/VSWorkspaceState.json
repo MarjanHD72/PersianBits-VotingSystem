@@ -1,6 +1,13 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Votingsystem.frontend",
+    "\\Votingsystem.frontend\\Votingsystem.frontend",
+    "\\Votingsystem.frontend\\Votingsystem.frontend\\Pages",
+    "\\Votingsystem.frontend\\Votingsystem.frontend\\Pages\\Auth",
+    "\\Votingsystem.frontend\\Votingsystem.frontend\\Pages\\Join",
+    "\\Votingsystem.frontend\\Votingsystem.frontend\\wwwroot\\js"
   ],
+  "SelectedNode": "\\Votingsystem.frontend\\Votingsystem.frontend\\Pages\\Index.cshtml",
   "PreviewInSolutionExplorer": false
 }
