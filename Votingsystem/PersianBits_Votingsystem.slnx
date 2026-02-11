@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="VotingSystem.Application/VotingSystem.Application.csproj" Id="c8905e6d-520f-4098-a193-67953219bc63" />
   <Project Path="VotingSystem.Domain/VotingSystem.Domain.csproj" Id="b3948f6d-7cd5-488e-8989-db21edc65d25" />
-  <Project Path="Votingsystem.frontend/Votingsystem.frontend.csproj" />
+  <Project Path="Votingsystem.frontend/Votingsystem.frontend.csproj" DisplayName="VotingSystem.frontend" />
 </Solution>
