@@ -5,61 +5,164 @@
 }
 
 @*
-    REGISTER CHOICE PAGE
-    --------------------
-    User chooses what type of account they want:
-    1) Creator (admin dashboard access later)
-    2) User (simple voter account)
+  SINGLE REGISTRATION PAGE (Frontend-only)
+  Fields:
+  - Full name
+  - Date of birth (18+ validation)
+  - Email
+  - Password + Confirm
+  - Optional: request creator/admin access (not auto-approved)
+
+  After register:
+  - pb_isLoggedIn = true
+  - pb_isApprovedCreator = false
+  - pb_requestedCreator = true/false
+  - If pb_pendingSession exists -> go to Poll/Take?session=...
+  - Else -> User Dashboard
 *@
 
 <section class="min-h-[70vh] flex items-center justify-center">
-    <div class="w-full max-w-2xl space-y-8">
+    <div class="w-full max-w-xl space-y-6">
 
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-semibold">Create your account</h1>
-            <p class="text-slate-400">Choose the type of registration.</p>
+            <p class="text-slate-400">Register to join elections and polls.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-4">
 
-            <a asp-page="/Auth/Register/User"
-               class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 hover:bg-slate-900/70 transition text-left">
-                <p class="text-sm text-slate-400">Simple registration</p>
-                <h2 class="text-xl font-semibold mt-1">User</h2>
-                <p class="text-sm text-slate-400 mt-2">Email, username, password.</p>
+            <label class="block">
+                <span class="text-sm text-slate-300">Full name</span>
+                <input id="regName"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="e.g. Mohammad Saberi" />
+            </label>
 
-                <div class="mt-5">
-                    <span class="inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium
-                                 bg-indigo-500 text-slate-950
-                                 group-hover:bg-indigo-400 transition
-                                 shadow-[0_0_25px_rgba(99,102,241,0.35)]">
-                        Register as User
+            <label class="block">
+                <span class="text-sm text-slate-300">Date of birth</span>
+                <input id="regDob" type="date"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <span class="text-xs text-slate-500">You must be 18+ to participate.</span>
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Email</span>
+                <input id="regEmail" type="email"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="name@example.com" />
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Password</span>
+                <input id="regPass" type="password"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="••••••••" />
+                <span class="text-xs text-slate-500">Minimum 8 characters (prototype rule).</span>
+            </label>
+
+            <label class="block">
+                <span class="text-sm text-slate-300">Confirm password</span>
+                <input id="regPass2" type="password"
+                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="••••••••" />
+            </label>
+
+            <label class="flex items-start gap-3 pt-1">
+                <input id="reqCreator" type="checkbox" class="mt-1 accent-indigo-500" />
+                <span class="text-sm text-slate-300">
+                    I want to become a creator/admin (requires approval)
+                    <span class="block text-xs text-slate-500 mt-1">
+                        You won’t get admin access automatically. Owner approval only.
                     </span>
-                </div>
-            </a>
+                </span>
+            </label>
 
-            <a asp-page="/Auth/Register/Creator"
-               class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 hover:bg-slate-900/70 transition text-left">
-                <p class="text-sm text-slate-400">More validation</p>
-                <h2 class="text-xl font-semibold mt-1">Creator</h2>
-                <p class="text-sm text-slate-400 mt-2">For poll creators (admin access later).</p>
+            <p id="regError" class="hidden text-sm text-rose-300"></p>
 
-                <div class="mt-5">
-                    <span class="inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium
-                                 border border-indigo-500/60 text-indigo-300
-                                 group-hover:bg-indigo-500/10 transition
-                                 shadow-[0_0_25px_rgba(99,102,241,0.22)]">
-                        Register as Creator
-                    </span>
-                </div>
-            </a>
+            <div class="pt-2 space-y-3">
+                <button id="regBtn" type="button"
+                        class="w-full px-4 py-3 rounded-xl font-medium bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950
+                               shadow-[0_0_25px_rgba(99,102,241,0.35)] text-center block">
+                    Create account
+                </button>
 
+                <a asp-page="/Auth/Login"
+                   class="block text-center text-sm text-slate-400 hover:text-slate-200">
+                    Already have an account? Login
+                </a>
+            </div>
         </div>
 
-        <div class="text-center">
-            <a asp-page="/Auth/Login" class="text-sm text-indigo-300 hover:text-indigo-200">
-                Already have an account? Login
-            </a>
-        </div>
+        <p class="text-xs text-slate-500 text-center">
+            Prototype: backend will store accounts and process creator approval.
+        </p>
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        (() => {
+          const $ = (id) => document.getElementById(id);
+
+          const yearsAgo = (n) => {
+            const d = new Date();
+            d.setFullYear(d.getFullYear() - n);
+            return d;
+          };
+
+          $("regBtn").addEventListener("click", () => {
+            const name = $("regName").value.trim();
+            const dobRaw = $("regDob").value;
+            const email = $("regEmail").value.trim();
+            const p1 = $("regPass").value;
+            const p2 = $("regPass2").value;
+            const wantsCreator = $("reqCreator").checked;
+
+            const err = $("regError");
+            err.classList.add("hidden");
+            err.textContent = "";
+
+            if (!name) { err.textContent = "Enter your full name."; err.classList.remove("hidden"); return; }
+            if (!dobRaw) { err.textContent = "Select your date of birth."; err.classList.remove("hidden"); return; }
+
+            const dob = new Date(dobRaw + "T00:00:00");
+            if (isNaN(dob.getTime())) { err.textContent = "Invalid date of birth."; err.classList.remove("hidden"); return; }
+
+            // 18+ rule
+            if (dob > yearsAgo(18)) {
+              err.textContent = "You must be 18+ to register.";
+              err.classList.remove("hidden");
+              return;
+            }
+
+            if (!email) { err.textContent = "Enter an email."; err.classList.remove("hidden"); return; }
+            if (!p1 || p1.length < 8) { err.textContent = "Password must be at least 8 characters."; err.classList.remove("hidden"); return; }
+            if (p1 !== p2) { err.textContent = "Passwords do not match."; err.classList.remove("hidden"); return; }
+
+            // Frontend-only auth state
+            localStorage.setItem("pb_isLoggedIn", "true");
+            localStorage.setItem("pb_isApprovedCreator", "false"); // approval is manual later
+            localStorage.setItem("pb_requestedCreator", wantsCreator ? "true" : "false");
+
+            // Store profile basics (frontend-only placeholders)
+            localStorage.setItem("pb_userName", name);
+            localStorage.setItem("pb_userDob", dobRaw);
+            localStorage.setItem("pb_userEmail", email);
+
+            // Continue pending session if exists
+            const pending = localStorage.getItem("pb_pendingSession");
+            if (pending) {
+              window.location.href = `/Poll/Take?session=${encodeURIComponent(pending)}`;
+              return;
+            }
+
+            window.location.href = "/User/Dashboard";
+          });
+        })();
+    </script>
+}

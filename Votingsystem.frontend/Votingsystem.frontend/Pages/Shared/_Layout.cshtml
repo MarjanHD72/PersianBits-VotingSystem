@@ -1,16 +1,4 @@
-﻿@*
-    _Layout.cshtml
-    -------------
-    This is the shared layout for the entire Razor Pages site.
-
-    - Header + footer live here (shown on every page).
-    - Each page injects its content into @RenderBody().
-    - Tailwind is included via CDN for a modern UI without extra setup.
-*@
-
-@{
-    // Page title shown in the browser tab.
-    // Individual pages can override this by setting ViewData["Title"].
+﻿@{
     var title = ViewData["Title"] as string ?? "PersianBits Voting System";
 }
 
@@ -21,58 +9,293 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@title</title>
 
-    @* Tailwind CSS (CDN). Easy for prototyping. *@
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --pb-bg: #0D0D0D;
+            --pb-bg2: #121212;
+            --pb-text: #F5F5F5;
+            --pb-muted: #CFCFCF;
+            --pb-muted2: #B0B0B0;
+            --pb-gold: #D4AF37;
+            --pb-goldGlow: #FFC94A;
+            --pb-blue: #3B82F6;
+            --pb-purple: #7C3AED;
+            --pb-glass: rgba(0,0,0,0.55);
+            --pb-glass2: rgba(0,0,0,0.40);
+            --pb-glassBorder: rgba(212,175,55,0.20);
+        }
+
+        body {
+            background: var(--pb-bg);
+            color: var(--pb-text);
+        }
+
+        /* Background wrapper */
+        .pb-bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -10;
+            overflow: hidden;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(59,130,246,0.10), transparent 60%), radial-gradient(1000px 500px at 90% 20%, rgba(124,58,237,0.10), transparent 60%), linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.85));
+        }
+
+        .pb-bg-image {
+            position: absolute;
+            inset: -40px;
+            background-image: url('/assets/bg-vote.png');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px) saturate(1.05);
+            transform: scale(1.06);
+            opacity: 0.33;
+        }
+
+
+        /* ============================
+                   GLOBAL OVERRIDES 
+                   ============================ */
+
+        /* panels */
+        .bg-slate-900\/40 {
+            background-color: var(--pb-glass) !important;
+        }
+
+        .bg-slate-950\/40 {
+            background-color: var(--pb-glass2) !important;
+        }
+
+        .bg-slate-900\/70 {
+            background-color: rgba(0,0,0,0.62) !important;
+        }
+
+        /* borders */
+        .border-slate-800 {
+            border-color: var(--pb-glassBorder) !important;
+        }
+
+        .border-slate-700 {
+            border-color: rgba(212,175,55,0.16) !important;
+        }
+
+        .border-b.border-slate-800 {
+            border-bottom-color: rgba(212,175,55,0.18) !important;
+        }
+
+        /* text */
+        .text-slate-400 {
+            color: var(--pb-muted) !important;
+        }
+
+        .text-slate-500 {
+            color: var(--pb-muted2) !important;
+        }
+
+        /* Make ALL old indigo buttons go GOLD  */
+        .bg-indigo-500 {
+            background: linear-gradient(135deg, var(--pb-gold), var(--pb-goldGlow)) !important;
+            color: #111 !important;
+        }
+
+        .hover\:bg-indigo-400:hover {
+            background: linear-gradient(135deg, var(--pb-goldGlow), var(--pb-gold)) !important;
+            color: #111 !important;
+        }
+
+        
+        .border-indigo-500\/30 {
+            border-color: rgba(212,175,55,0.28) !important;
+        }
+
+        .text-indigo-200 {
+            color: rgba(212,175,55,0.92) !important;
+        }
+
+        .text-indigo-300 {
+            color: rgba(212,175,55,0.92) !important;
+        }
+
+        .bg-indigo-500\/10 {
+            background-color: rgba(212,175,55,0.08) !important;
+        }
+
+        .bg-indigo-500\/15 {
+            background-color: rgba(212,175,55,0.10) !important;
+        }
+
+        
+        [class*="shadow-[0_0_25px_rgba(99,102,241"] {
+            box-shadow: 0 0 22px rgba(212,175,55,0.28) !important;
+        }
+
+        [class*="shadow-[0_0_30px_rgba(99,102,241"] {
+            box-shadow: 0 0 30px rgba(255,201,74,0.25) !important;
+        }
+
+       
+        input, select, textarea {
+            background: rgba(0,0,0,0.55) !important;
+            color: var(--pb-text) !important;
+            border: 1px solid rgba(212,175,55,0.18) !important;
+            outline: none !important;
+        }
+
+            input::placeholder, textarea::placeholder {
+                color: rgba(207,207,207,0.70) !important;
+            }
+
+            input:focus, select:focus, textarea:focus {
+                border-color: rgba(255,201,74,0.45) !important;
+                box-shadow: 0 0 0 3px rgba(212,175,55,0.10) !important;
+            }
+
+        /* logo (top left) */
+
+        .pb-logo {
+            width: 56px; 
+            height: 56px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.40);
+            box-shadow: 0 0 18px rgba(255,201,74,0.12);
+            background: rgba(0,0,0,0.45);
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+        }
+
+            .pb-logo img {
+                width: 95%; /* leave breathing room inside circle */
+                height: 95%;
+                object-fit: contain; /* key change: don’t crop the logo */
+                object-position: center;
+                display: block;
+                border-radius: 9999px; /* keeps transparency edges clean */
+            }
+
+        /*  “premium” outline buttons */
+        .pb-btn-outline {
+            border: 1px solid rgba(212,175,55,0.35);
+            color: var(--pb-text);
+            border-radius: 14px;
+            transition: all 0.25s ease;
+        }
+
+            .pb-btn-outline:hover {
+                background: rgba(212,175,55,0.08);
+            }
+
+        .pb-hero-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.45);
+            background: rgba(0,0,0,0.35);
+            box-shadow: 0 0 28px rgba(255,201,74,0.16);
+            display: grid;
+            place-items: center;
+            margin: 0 auto;
+        }
+
+            .pb-hero-logo img {
+                width: 120%;
+                height: 120%;
+                object-fit: contain;
+                object-position: center;
+                display: block;
+                border-radius: 9999px;
+            }
+    </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen">
-    @* Wrapper to keep footer at the bottom *@
+<body class="min-h-screen">
+    <div class="pb-bg-wrap">
+        <div class="pb-bg-image"></div>
+        <div class="pb-shimmer"></div>
+    </div>
+
     <div class="min-h-screen flex flex-col">
 
-        @* HEADER *@
-        <header class="sticky top-0 z-40 backdrop-blur bg-slate-950/70 border-b border-slate-800">
+        <header class="sticky top-0 z-40 backdrop-blur bg-slate-950/40 border-b border-slate-800">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
-                @* Brand / Logo (clicking goes to home page) *@
-                <a asp-page="/Index" class="flex items-center gap-2 font-semibold tracking-tight">
-                    <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20 border border-indigo-500/30">
-                        <span class="text-indigo-300">P</span>
+                <a asp-page="/Index" class="flex items-center gap-3 font-semibold tracking-tight">
+                    <span class="pb-logo">
+                        <img src="~/assets/logo.jpg" alt="PersianBits logo" />
                     </span>
                     <span>PersianBits Voting System</span>
                 </a>
 
-                @*
-                    Minimal navigation (your requirement):
-                    - No "Admin" or "User" buttons here.
-                    - Everyone goes through Login.
-                    - Later backend decides where to send them after successful login.
-                *@
                 <nav class="flex items-center gap-2">
-                    <a asp-page="/Auth/Login"
-                       class="px-3 py-2 rounded-xl text-sm bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium">
+                    <a id="navLogin"
+                       asp-page="/Auth/Login"
+                       class="px-3 py-2 rounded-xl text-sm bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium">
                         Login
                     </a>
+
+                    <a id="navDashboard"
+                       href="#"
+                       class="hidden px-3 py-2 rounded-xl text-sm border border-slate-800 hover:bg-slate-800/60">
+                        Dashboard
+                    </a>
+
+                    <button id="navLogout"
+                            type="button"
+                            class="hidden px-3 py-2 rounded-xl text-sm border border-slate-800 hover:bg-slate-800/60">
+                        Logout
+                    </button>
                 </nav>
 
             </div>
         </header>
 
-        @* MAIN CONTENT (each page renders here) *@
         <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
             @RenderBody()
         </main>
 
-        @* FOOTER *@
         <footer class="border-t border-slate-800/80">
             <div class="max-w-6xl mx-auto px-4 py-6 text-xs text-slate-400 flex items-center justify-between">
-                <span>PersianBits Voting System • Frontend prototype</span>
+                <span>PersianBits Voting System</span>
                 <span>© @DateTime.Now.Year PersianBits</span>
             </div>
         </footer>
 
     </div>
 
-    @* Optional per-page scripts *@
     @RenderSection("Scripts", required: false)
+
+    <script>
+        (() => {
+          const isLoggedIn = localStorage.getItem("pb_isLoggedIn") === "true";
+          const isCreator = localStorage.getItem("pb_isApprovedCreator") === "true";
+
+          const login = document.getElementById("navLogin");
+          const dash = document.getElementById("navDashboard");
+          const logout = document.getElementById("navLogout");
+
+          // Always reset to logged-out UI first (prevents “stuck Login” vs “stuck Logout” weirdness)
+          login?.classList.remove("hidden");
+          dash?.classList.add("hidden");
+          logout?.classList.add("hidden");
+
+          if (isLoggedIn) {
+            login?.classList.add("hidden");
+            dash?.classList.remove("hidden");
+            logout?.classList.remove("hidden");
+
+            dash.href = isCreator ? "/Admin/Dashboard" : "/User/Dashboard";
+
+            logout.onclick = () => {
+              localStorage.removeItem("pb_isLoggedIn");
+              localStorage.removeItem("pb_isApprovedCreator");
+              localStorage.removeItem("pb_userEmail");
+              localStorage.removeItem("pb_requestedCreator");
+              window.location.href = "/Index";
+            };
+          }
+        })();
+    </script>
 </body>
 </html>

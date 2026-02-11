@@ -4,82 +4,177 @@
     ViewData["Title"] = "User Dashboard";
 }
 
-@*
-    USER DASHBOARD (Frontend Only)
-    ------------------------------
-    Requirements you gave:
-    - Very simple for users (minimal buttons).
-    - Users can join using: invite link / session ID / QR.
-    - Users participate in polls (vote, submit, done).
+<style>
+    /* Local helpers  */
+    .pb-muted {
+        color: var(--pb-muted);
+    }
 
-    This dashboard does:
-    - One main action: "Join a Poll"
-    - One simple list of polls the user can do now (mock data)
-    - Keeps UI uncluttered
-*@
+    .pb-card {
+        background: var(--pb-glass);
+        border: 1px solid var(--pb-glassBorder);
+        border-radius: 1.25rem; /* 20px */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .pb-card-strong {
+        box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .pb-row {
+        background: var(--pb-glass2);
+        border: 1px solid rgba(212,175,55,0.16);
+        border-radius: 1rem; /* 16px */
+    }
+
+    .pb-btn {
+        padding: .75rem 1.25rem;
+        border-radius: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        transition: all .2s ease;
+        min-width: 110px;
+    }
+
+    /* Primary = your gold gradient */
+    .pb-btn-primary {
+        background: linear-gradient(135deg, var(--pb-gold), var(--pb-goldGlow));
+        color: #111;
+        box-shadow: 0 0 18px rgba(212,175,55,0.25);
+    }
+
+        .pb-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 30px rgba(255,201,74,0.45);
+        }
+
+    /* Ghost = subtle glass outline */
+    .pb-btn-ghost {
+        background: rgba(0,0,0,0.20);
+        border: 1px solid rgba(212,175,55,0.28);
+        color: var(--pb-text);
+    }
+
+        .pb-btn-ghost:hover {
+            background: rgba(212,175,55,0.08);
+        }
+
+    /* Chip on the join card (small gold accent, not “casino”) */
+    .pb-chip {
+        padding: .55rem 1rem;
+        border-radius: 14px;
+        font-weight: 700;
+        background: rgba(212,175,55,0.16);
+        border: 1px solid rgba(212,175,55,0.35);
+        color: var(--pb-text);
+        box-shadow: 0 0 18px rgba(255,201,74,0.10);
+        transition: all .2s ease;
+    }
+
+    a:hover .pb-chip {
+        background: rgba(212,175,55,0.22);
+        box-shadow: 0 0 26px rgba(255,201,74,0.18);
+    }
+</style>
 
 <section class="space-y-8">
 
     <!-- Header -->
     <div class="space-y-2">
-        <h1 class="text-2xl font-semibold">Welcome</h1>
-        <p class="text-slate-400">Join a poll and submit your answers in a few taps.</p>
+        <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">Welcome</h1>
+        <p class="pb-muted">Join an election and submit your vote in a few taps.</p>
     </div>
 
-    <!-- Main action: Join -->
-    <a asp-page="/Join/Index"
-       class="group block rounded-2xl border border-slate-800 bg-slate-900/40 p-6 hover:bg-slate-900/70 transition">
-        <div class="flex items-start justify-between gap-4">
+    <!-- Continue pending join -->
+    <div id="pendingJoinCard" class="hidden pb-card pb-card-strong p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <p class="text-sm text-slate-400">Join via link, session ID, or QR</p>
-                <h2 class="text-xl font-semibold mt-1">Join a Poll</h2>
-                <p class="text-sm text-slate-400 mt-2">
-                    If you have a code, you can enter it and start instantly.
+                <p class="pb-muted text-sm">You have a session waiting</p>
+                <h2 class="text-xl font-semibold mt-1" style="color: var(--pb-text);">
+                    Continue joining: <span id="pendingSessionText" style="color: var(--pb-text);"></span>
+                </h2>
+                <p class="pb-muted text-sm mt-2">
+                    We saved your Session ID. Click continue to enter the election.
                 </p>
             </div>
 
-            <!-- Neon-ish chip -->
-            <div class="shrink-0 px-4 py-2 rounded-xl font-medium bg-indigo-500 text-slate-950
-                        shadow-[0_0_25px_rgba(99,102,241,0.35)] group-hover:bg-indigo-400 transition">
+            <button id="pendingJoinBtn" class="pb-btn pb-btn-primary shrink-0">
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- Main action: Join -->
+    <a asp-page="/Join/Index" class="block pb-card pb-card-strong p-6">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="pb-muted text-sm">Join via Session ID or link</p>
+                <h2 class="text-xl font-semibold mt-1" style="color: var(--pb-text);">Join an election</h2>
+                <p class="pb-muted text-sm mt-2">
+                    Enter a session code and start instantly.
+                </p>
+            </div>
+
+            <div class="pb-chip shrink-0">
                 Join
             </div>
         </div>
     </a>
 
     <!-- Available polls (mock) -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
+    <div class="pb-card pb-card-strong p-5 space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-lg">Available now</h2>
-            <span class="text-xs text-slate-400">Mock data</span>
+            <h2 class="font-semibold text-lg" style="color: var(--pb-text);">Available now</h2>
+            <span class="pb-muted text-xs">Mock data</span>
         </div>
 
-        <!-- Poll card -->
-        <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <!-- Poll row -->
+        <div class="pb-row p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="space-y-1">
-                <p class="font-medium">Student Satisfaction Survey</p>
-                <p class="text-sm text-slate-400">Estimated time: 2 minutes</p>
+                <p class="font-medium" style="color: var(--pb-text);">Student Satisfaction Survey</p>
+                <p class="pb-muted text-sm">Estimated time: 2 minutes</p>
             </div>
 
-            <!-- Minimal action: Start -->
-            <a asp-page="/Poll/Take"
-               class="px-4 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium text-center
-                      shadow-[0_0_25px_rgba(99,102,241,0.35)]">
+            <a asp-page="/Poll/Take" class="pb-btn pb-btn-primary text-center">
                 Start
             </a>
         </div>
 
-        <!-- Poll card -->
-        <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <!-- Poll row -->
+        <div class="pb-row p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div class="space-y-1">
-                <p class="font-medium">Event Feedback</p>
-                <p class="text-sm text-slate-400">Estimated time: 1 minute</p>
+                <p class="font-medium" style="color: var(--pb-text);">Event Feedback</p>
+                <p class="pb-muted text-sm">Estimated time: 1 minute</p>
             </div>
 
-            <a asp-page="/Poll/Take"
-               class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60 font-medium text-center">
+            <a asp-page="/Poll/Take" class="pb-btn pb-btn-ghost text-center">
                 Start
             </a>
         </div>
     </div>
 
 </section>
+
+@section Scripts {
+    <script>
+        (() => {
+          const pending = localStorage.getItem("pb_pendingSession");
+          const card = document.getElementById("pendingJoinCard");
+          const text = document.getElementById("pendingSessionText");
+          const btn = document.getElementById("pendingJoinBtn");
+
+          if (pending && card && text && btn) {
+            text.textContent = pending;
+            card.classList.remove("hidden");
+
+            btn.addEventListener("click", () => {
+              window.location.href = `/Poll/Take?session=${encodeURIComponent(pending)}`;
+            });
+          }
+        })();
+    </script>
+}
