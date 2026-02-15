@@ -1,0 +1,510 @@
+@{
+    var title = ViewData["Title"] as string ?? "PersianBits Voting System";
+}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ================================================
+           THEME TOKENS
+           ================================================ */
+        :root {
+            --transition: background-color 0.35s ease, color 0.35s ease,
+                          border-color 0.35s ease, box-shadow 0.35s ease,
+                          opacity 0.35s ease;
+        }
+
+        /* ---------- DARK MODE (your existing colors, preserved exactly) ---------- */
+        [data-theme="dark"] {
+            --pb-bg:          #0D0D0D;
+            --pb-bg2:         #121212;
+            --pb-surface:     rgba(0,0,0,0.55);
+            --pb-surface2:    rgba(0,0,0,0.40);
+            --pb-elevated:    rgba(0,0,0,0.62);
+            --pb-text:        #F5F5F5;
+            --pb-muted:       #CFCFCF;
+            --pb-muted2:      #B0B0B0;
+            --pb-gold:        #D4AF37;
+            --pb-goldGlow:    #FFC94A;
+            --pb-blue:        #3B82F6;
+            --pb-purple:      #7C3AED;
+            --pb-glass:       rgba(0,0,0,0.55);
+            --pb-glass2:      rgba(0,0,0,0.40);
+            --pb-glassBorder: rgba(212,175,55,0.20);
+            --pb-border:      rgba(212,175,55,0.20);
+            --pb-border2:     rgba(212,175,55,0.16);
+            --pb-inputBg:     rgba(0,0,0,0.55);
+            --pb-inputBorder: rgba(212,175,55,0.18);
+            --pb-inputFocus:  rgba(255,201,74,0.45);
+            --pb-success:     #34d399;
+            --pb-successBg:   rgba(52,211,153,0.15);
+            --pb-successBdr:  rgba(52,211,153,0.25);
+            --pb-warning:     #fbbf24;
+            --pb-warningBg:   rgba(251,191,36,0.15);
+            --pb-warningBdr:  rgba(251,191,36,0.25);
+            --pb-danger:      #f87171;
+            --pb-dangerBg:    rgba(248,113,113,0.10);
+            --pb-dangerBdr:   rgba(239,68,68,0.30);
+            --pb-draftText:   #cbd5e1;
+            --pb-draftBg:     rgba(148,163,184,0.20);
+            --pb-draftBdr:    rgba(148,163,184,0.30);
+            --pb-goldSubtle:  rgba(212,175,55,0.08);
+            --pb-goldBorder:  rgba(212,175,55,0.28);
+            --pb-shadow:      0 10px 30px rgba(0,0,0,.25);
+            --pb-shadowGlow:  0 0 22px rgba(212,175,55,0.28);
+            --pb-btnGlow:     0 0 30px rgba(255,201,74,0.25);
+            --pb-bgGrad:      radial-gradient(1200px 600px at 10% 10%, rgba(59,130,246,0.10), transparent 60%),
+                              radial-gradient(1000px 500px at 90% 20%, rgba(124,58,237,0.10), transparent 60%),
+                              linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.85));
+            --pb-bgImageOpacity: 0.33;
+            --pb-avatarBg:    rgba(212,175,55,0.20);
+            --pb-avatarBdr:   rgba(212,175,55,0.30);
+        }
+
+        /* ---------- LIGHT MODE ---------- */
+        [data-theme="light"] {
+            --pb-bg:          #f5f3ef;
+            --pb-bg2:         #ede9e1;
+            --pb-surface:     rgba(255,255,255,0.85);
+            --pb-surface2:    rgba(255,255,255,0.60);
+            --pb-elevated:    rgba(255,255,255,0.92);
+            --pb-text:        #1a1611;
+            --pb-muted:       #5c564c;
+            --pb-muted2:      #8a8278;
+            --pb-gold:        #b8941e;
+            --pb-goldGlow:    #d4af37;
+            --pb-blue:        #2563eb;
+            --pb-purple:      #6d28d9;
+            --pb-glass:       rgba(255,255,255,0.72);
+            --pb-glass2:      rgba(255,255,255,0.55);
+            --pb-glassBorder: rgba(180,148,30,0.22);
+            --pb-border:      rgba(180,148,30,0.22);
+            --pb-border2:     rgba(180,148,30,0.15);
+            --pb-inputBg:     rgba(255,255,255,0.80);
+            --pb-inputBorder: rgba(180,148,30,0.25);
+            --pb-inputFocus:  rgba(180,148,30,0.50);
+            --pb-success:     #059669;
+            --pb-successBg:   rgba(5,150,105,0.10);
+            --pb-successBdr:  rgba(5,150,105,0.25);
+            --pb-warning:     #d97706;
+            --pb-warningBg:   rgba(217,119,6,0.10);
+            --pb-warningBdr:  rgba(217,119,6,0.25);
+            --pb-danger:      #dc2626;
+            --pb-dangerBg:    rgba(220,38,38,0.08);
+            --pb-dangerBdr:   rgba(220,38,38,0.25);
+            --pb-draftText:   #64748b;
+            --pb-draftBg:     rgba(100,116,139,0.12);
+            --pb-draftBdr:    rgba(100,116,139,0.25);
+            --pb-goldSubtle:  rgba(180,148,30,0.06);
+            --pb-goldBorder:  rgba(180,148,30,0.30);
+            --pb-shadow:      0 4px 16px rgba(0,0,0,.08);
+            --pb-shadowGlow:  0 0 16px rgba(180,148,30,0.18);
+            --pb-btnGlow:     0 0 20px rgba(180,148,30,0.20);
+            --pb-bgGrad:      radial-gradient(1200px 600px at 10% 10%, rgba(59,130,246,0.04), transparent 60%),
+                              radial-gradient(1000px 500px at 90% 20%, rgba(124,58,237,0.04), transparent 60%),
+                              linear-gradient(180deg, rgba(255,255,255,0.0), rgba(245,243,239,0.6));
+            --pb-bgImageOpacity: 0.08;
+            --pb-avatarBg:    rgba(180,148,30,0.15);
+            --pb-avatarBdr:   rgba(180,148,30,0.30);
+        }
+
+        /* ================================================
+           GLOBAL BASE
+           ================================================ */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--pb-bg);
+            color: var(--pb-text);
+            transition: var(--transition);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .pb-bg-wrap {
+            position: fixed; inset: 0; z-index: -10; overflow: hidden;
+            background: var(--pb-bgGrad);
+            transition: var(--transition);
+        }
+        .pb-bg-image {
+            position: absolute; inset: -40px;
+            background-image: url('/assets/bg-vote.png');
+            background-size: cover; background-position: center;
+            filter: blur(8px) saturate(1.05);
+            transform: scale(1.06);
+            opacity: var(--pb-bgImageOpacity);
+            transition: opacity 0.5s ease;
+        }
+
+        /* ================================================
+           REUSABLE COMPONENTS
+           ================================================ */
+
+        /* Card */
+        .pb-card {
+            background: var(--pb-glass);
+            border: 1px solid var(--pb-border);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--pb-shadow);
+            transition: var(--transition), transform 0.2s ease;
+        }
+        .pb-card-flat {
+            background: var(--pb-glass2);
+            border: 1px solid var(--pb-border2);
+            border-radius: 16px;
+            transition: var(--transition);
+        }
+        .pb-card-interactive { cursor: pointer; }
+        .pb-card-interactive:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pb-shadowGlow);
+        }
+
+        /* Stat card */
+        .pb-stat-card {
+            background: var(--pb-glass);
+            border: 1px solid var(--pb-border);
+            border-radius: 20px; padding: 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: var(--pb-shadow);
+            transition: var(--transition), transform 0.2s ease;
+        }
+        .pb-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--pb-shadowGlow);
+        }
+        .pb-stat-label {
+            font-size: 0.8rem; font-weight: 500;
+            color: var(--pb-muted2);
+            text-transform: uppercase; letter-spacing: 0.06em;
+        }
+        .pb-stat-value {
+            font-size: 2rem; font-weight: 700;
+            color: var(--pb-text);
+            line-height: 1.1; margin-top: 8px;
+        }
+
+        /* Row inside card */
+        .pb-row {
+            background: var(--pb-glass2);
+            border: 1px solid var(--pb-border2);
+            border-radius: 16px;
+            transition: var(--transition);
+        }
+
+        /* Badges */
+        .pb-badge {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+        .pb-badge-success { background: var(--pb-successBg); color: var(--pb-success); border: 1px solid var(--pb-successBdr); }
+        .pb-badge-warning { background: var(--pb-warningBg); color: var(--pb-warning); border: 1px solid var(--pb-warningBdr); }
+        .pb-badge-danger  { background: var(--pb-dangerBg);  color: var(--pb-danger);  border: 1px solid var(--pb-dangerBdr); }
+        .pb-badge-draft   { background: var(--pb-draftBg);   color: var(--pb-draftText); border: 1px solid var(--pb-draftBdr); }
+        .pb-badge-gold    { background: var(--pb-goldSubtle); color: var(--pb-gold); border: 1px solid var(--pb-goldBorder); }
+
+        /* Buttons */
+        .pb-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 0.5rem; padding: 0.65rem 1.25rem;
+            border-radius: 14px; font-weight: 600; font-size: 0.875rem;
+            transition: all 0.2s ease; cursor: pointer; border: none;
+            text-decoration: none;
+        }
+        .pb-btn-gold {
+            background: linear-gradient(135deg, var(--pb-gold), var(--pb-goldGlow));
+            color: #111; box-shadow: var(--pb-btnGlow);
+        }
+        .pb-btn-gold:hover {
+            filter: brightness(1.08); transform: translateY(-1px);
+        }
+        .pb-btn-outline {
+            background: transparent;
+            border: 1px solid var(--pb-border);
+            color: var(--pb-text);
+        }
+        .pb-btn-outline:hover { background: var(--pb-goldSubtle); }
+        .pb-btn-danger-outline {
+            background: transparent;
+            border: 1px solid var(--pb-dangerBdr);
+            color: var(--pb-danger);
+        }
+        .pb-btn-danger-outline:hover { background: var(--pb-dangerBg); }
+
+        /* Progress bar */
+        .pb-progress {
+            width: 100%; height: 12px;
+            border-radius: 12px; overflow: hidden;
+            background: var(--pb-surface2);
+        }
+        .pb-progress-fill {
+            height: 100%; border-radius: 12px;
+            background: linear-gradient(90deg, var(--pb-gold), var(--pb-goldGlow));
+            transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        /* Inputs */
+        input, select, textarea {
+            background: var(--pb-inputBg) !important;
+            color: var(--pb-text) !important;
+            border: 1px solid var(--pb-inputBorder) !important;
+            outline: none !important;
+            transition: var(--transition);
+        }
+        input::placeholder, textarea::placeholder {
+            color: var(--pb-muted2) !important; opacity: 0.7;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--pb-inputFocus) !important;
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.10) !important;
+        }
+
+        /* Avatar */
+        .pb-avatar {
+            width: 40px; height: 40px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600;
+            background: var(--pb-avatarBg);
+            border: 1px solid var(--pb-avatarBdr);
+            color: var(--pb-gold);
+        }
+
+        /* Logo */
+        .pb-logo {
+            width: 48px; height: 48px;
+            border-radius: 9999px; overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.40);
+            box-shadow: 0 0 18px rgba(255,201,74,0.12);
+            background: var(--pb-surface);
+            display: grid; place-items: center; flex: 0 0 auto;
+        }
+        .pb-logo img {
+            width: 95%; height: 95%;
+            object-fit: contain; display: block; border-radius: 9999px;
+        }
+        .pb-hero-logo {
+            width: 120px; height: 120px;
+            border-radius: 9999px; overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.45);
+            background: var(--pb-surface);
+            box-shadow: 0 0 28px rgba(255,201,74,0.16);
+            display: grid; place-items: center; margin: 0 auto;
+        }
+        .pb-hero-logo img {
+            width: 120%; height: 120%;
+            object-fit: contain; display: block; border-radius: 9999px;
+        }
+
+        /* Glass card (builder pages) */
+        .glass-card {
+            background: var(--pb-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--pb-border);
+            border-radius: 24px;
+            transition: var(--transition);
+        }
+
+        /* Theme toggle */
+        .pb-theme-toggle {
+            position: relative; width: 52px; height: 28px;
+            border-radius: 14px; cursor: pointer;
+            background: var(--pb-surface2);
+            border: 1.5px solid var(--pb-border);
+            transition: var(--transition);
+            display: flex; align-items: center; padding: 3px;
+        }
+        .pb-theme-toggle .knob {
+            width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            transition: transform 0.35s cubic-bezier(0.68,-0.55,0.27,1.55), background 0.3s ease;
+        }
+        [data-theme="dark"] .pb-theme-toggle .knob {
+            background: var(--pb-gold); transform: translateX(24px);
+        }
+        [data-theme="light"] .pb-theme-toggle .knob {
+            background: #f59e0b; transform: translateX(0);
+        }
+
+        /* Tailwind overrides for theme compat */
+        .text-slate-400, .text-slate-500 { color: var(--pb-muted) !important; }
+        .text-slate-300, .text-slate-200 { color: var(--pb-text) !important; }
+        .text-slate-100 { color: var(--pb-text) !important; }
+        .border-slate-800, .border-slate-700 { border-color: var(--pb-border) !important; }
+        .bg-slate-900\/40 { background-color: var(--pb-glass) !important; }
+        .bg-slate-950\/40 { background-color: var(--pb-glass2) !important; }
+        .bg-slate-900\/70 { background-color: var(--pb-elevated) !important; }
+        .bg-slate-950 { background-color: var(--pb-surface) !important; }
+        .bg-slate-900 { background-color: var(--pb-surface) !important; }
+        .bg-slate-800\/60, .hover\:bg-slate-800\/60:hover { background-color: var(--pb-surface2) !important; }
+        .hover\:bg-slate-800\/40:hover { background-color: var(--pb-goldSubtle) !important; }
+        .hover\:bg-slate-900\/70:hover { background-color: var(--pb-elevated) !important; }
+        .bg-black\/60 { background-color: var(--pb-surface) !important; }
+        .bg-black\/70 { background-color: var(--pb-surface) !important; }
+        .divide-slate-800 > * + * { border-color: var(--pb-border2) !important; }
+        .text-rose-300 { color: var(--pb-danger) !important; }
+        .border-rose-500\/30 { border-color: var(--pb-dangerBdr) !important; }
+        .hover\:bg-rose-500\/10:hover { background-color: var(--pb-dangerBg) !important; }
+        .bg-emerald-500\/15 { background-color: var(--pb-successBg) !important; }
+        .text-emerald-300 { color: var(--pb-success) !important; }
+        .border-emerald-500\/25 { border-color: var(--pb-successBdr) !important; }
+        .bg-amber-500\/15 { background-color: var(--pb-warningBg) !important; }
+        .text-amber-300 { color: var(--pb-warning) !important; }
+        .border-amber-500\/25 { border-color: var(--pb-warningBdr) !important; }
+        .text-indigo-300 { color: var(--pb-gold) !important; }
+        .bg-slate-500\/20 { background-color: var(--pb-draftBg) !important; }
+        .border-slate-500\/30 { border-color: var(--pb-draftBdr) !important; }
+        .text-slate-950 { color: #111 !important; }
+        footer { border-color: var(--pb-border2) !important; }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <div class="pb-bg-wrap">
+        <div class="pb-bg-image"></div>
+    </div>
+
+    <div class="min-h-screen flex flex-col">
+
+        <header class="sticky top-0 z-40 backdrop-blur" style="background: var(--pb-elevated); border-bottom: 1px solid var(--pb-border);">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+
+                <a asp-page="/Index" class="flex items-center gap-3 font-semibold tracking-tight" style="color: var(--pb-text); text-decoration: none;">
+                    <span class="pb-logo">
+                        <img src="~/assets/logo.jpg" alt="PersianBits logo" />
+                    </span>
+                    <span>PersianBits Voting System</span>
+                </a>
+
+                <nav class="flex items-center gap-2">
+                    <button class="pb-theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <div class="knob" id="themeKnob"></div>
+                    </button>
+
+                    <a id="navLogin" asp-page="/Auth/Login" class="pb-btn pb-btn-gold text-sm">Login</a>
+                    <a id="navDashboard" href="#" style="display:none;" class="pb-btn pb-btn-outline text-sm">Dashboard</a>
+
+                    <!-- Avatar (profile link) -->
+                    <a id="navAvatarLink" href="#" style="display:none; text-decoration:none;">
+                        <div id="navAvatar" style="
+                            width: 36px; height: 36px; border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1.2rem; cursor: pointer;
+                            background: var(--pb-avatarBg); border: 1.5px solid var(--pb-avatarBdr);
+                            transition: all 0.2s ease;
+                        "></div>
+                    </a>
+
+                    <button id="navLogout" type="button" style="display:none;" class="pb-btn pb-btn-outline text-sm">Logout</button>
+                </nav>
+
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
+            @RenderBody()
+        </main>
+
+        <footer style="border-top: 1px solid var(--pb-border2);">
+            <div class="max-w-6xl mx-auto px-4 py-6 text-xs flex items-center justify-between" style="color: var(--pb-muted2);">
+                <span>PersianBits Voting System</span>
+                <span>&copy; @DateTime.Now.Year PersianBits</span>
+            </div>
+        </footer>
+
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (() => {
+          // ===== THEME =====
+          const html = document.documentElement;
+          const toggle = document.getElementById('themeToggle');
+          const knob = document.getElementById('themeKnob');
+          function getTheme() { return localStorage.getItem('pb-theme') || 'dark'; }
+          function applyTheme(t) {
+            html.setAttribute('data-theme', t);
+            localStorage.setItem('pb-theme', t);
+            knob.textContent = t === 'dark' ? '🌙' : '☀️';
+          }
+          applyTheme(getTheme());
+          toggle.addEventListener('click', () => applyTheme(getTheme() === 'dark' ? 'light' : 'dark'));
+
+          // ===== AUTH NAV + AVATAR =====
+          const avatarEmojis = [
+            '😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼',
+            '🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸',
+            '🌻','⭐','🔥','💎','🎯','🎮','🎨','🎵','🚀','🏆',
+            '🎭','🎪','🧊','🌈','🍀','🎲','👻','🤖','👽','🧙'
+          ];
+
+          function getAvatar() {
+            let av = localStorage.getItem('pb_avatar');
+            if (!av) {
+              av = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+              localStorage.setItem('pb_avatar', av);
+            }
+            return av;
+          }
+
+          const isLoggedIn = localStorage.getItem("pb_isLoggedIn") === "true";
+          const isCreator = localStorage.getItem("pb_isApprovedCreator") === "true";
+          const login = document.getElementById("navLogin");
+          const dash = document.getElementById("navDashboard");
+          const logout = document.getElementById("navLogout");
+          const avatarLink = document.getElementById("navAvatarLink");
+          const avatarEl = document.getElementById("navAvatar");
+
+          function showEl(el) { if (el) el.style.display = 'inline-flex'; }
+          function hideEl(el) { if (el) el.style.display = 'none'; }
+
+          if (isLoggedIn) {
+            hideEl(login);
+            showEl(dash);
+            showEl(logout);
+            showEl(avatarLink);
+
+            dash.href = isCreator ? "/Admin/Dashboard" : "/User/Dashboard";
+            avatarLink.href = isCreator ? "/Admin/Profile" : "/User/Profile";
+            avatarEl.textContent = getAvatar();
+
+            // Hover glow on avatar
+            avatarLink.addEventListener('mouseenter', () => {
+              avatarEl.style.borderColor = 'var(--pb-gold)';
+              avatarEl.style.boxShadow = '0 0 12px rgba(212,175,55,0.35)';
+            });
+            avatarLink.addEventListener('mouseleave', () => {
+              avatarEl.style.borderColor = 'var(--pb-avatarBdr)';
+              avatarEl.style.boxShadow = 'none';
+            });
+
+            logout.onclick = () => {
+              localStorage.removeItem("pb_isLoggedIn");
+              localStorage.removeItem("pb_isApprovedCreator");
+              localStorage.removeItem("pb_userEmail");
+              localStorage.removeItem("pb_requestedCreator");
+              window.location.href = "/Index";
+            };
+          } else {
+            showEl(login);
+            hideEl(dash);
+            hideEl(logout);
+            hideEl(avatarLink);
+          }
+        })();
+    </script>
+</body>
+</html>
