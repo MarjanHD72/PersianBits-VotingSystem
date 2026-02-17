@@ -1,109 +1,44 @@
 ﻿@page
 @model VotingSystem.Frontend.Pages.Poll.TakeModel
 @{
-    ViewData["Title"] = "Take Poll";
 }
 
 @*
-    TAKE POLL (Frontend Only)
-    -------------------------
-    Design goals (from you):
-    - Modern
-    - Extremely simple for users
-    - Minimal buttons
-    - One question per “block” (later backend can make it truly step-by-step)
-    
-    This page currently shows 5 question types as a prototype:
-    1) Single choice
-    2) Multiple choice
-    3) Open-ended text
-    4) Rating scale
-    5) Ranking (UI placeholder)
-    
-    Later backend will:
-    - Load questions dynamically
-    - Track progress (question 1/10 etc.)
-    - Save answers
-    - Submit answers
 *@
 
-<section class="max-w-2xl mx-auto space-y-6">
 
-    <!-- Poll header -->
     <div class="space-y-2">
-        <p class="text-sm text-slate-400">PersianBits Voting Centre</p>
-        <h1 class="text-2xl font-semibold">Student Satisfaction Survey</h1>
-        <p class="text-slate-400">Answer honestly. This takes about 2 minutes.</p>
     </div>
 
-    <!-- Progress (static for now) -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
-        <div class="flex items-center justify-between text-sm text-slate-400">
-            <span>Progress</span>
-            <span>1 of 5</span>
         </div>
-        <div class="mt-3 h-2 rounded-full bg-slate-800 overflow-hidden">
-            <div class="h-2 w-[20%] bg-indigo-500"></div>
         </div>
-    </div>
+
+        <div class="candidate-card cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/40 p-4 hover:bg-slate-900/70 transition"
+             data-name="Mina Farhadi"
+             data-desc="Mina prioritizes student wellbeing, mental health resources, and campus community events."
+             data-img="https://images.unsplash.com/photo-1580489944761-15a19d654956">
+            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956"
+                 class="w-full h-48 object-cover rounded-xl mb-3" />
+            <h3 class="font-semibold">Mina Farhadi</h3>
+            <p class="text-sm text-slate-400 mt-1">Wellbeing & campus life</p>
+        </div>
 
     <!-- Question 1: Single choice -->
     <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
         <div>
             <p class="text-xs text-slate-400">Single choice</p>
             <h2 class="text-lg font-semibold mt-1">How satisfied are you with this module?</h2>
-        </div>
-
-        <div class="space-y-2">
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="radio" name="q1" class="accent-indigo-500" />
-                <span>Very satisfied</span>
-            </label>
-
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="radio" name="q1" class="accent-indigo-500" />
-                <span>Satisfied</span>
-            </label>
-
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="radio" name="q1" class="accent-indigo-500" />
-                <span>Neutral</span>
-            </label>
-
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="radio" name="q1" class="accent-indigo-500" />
-                <span>Dissatisfied</span>
-            </label>
-        </div>
     </div>
 
-    <!-- Question 2: Multiple choice -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Multiple choice</p>
-            <h2 class="text-lg font-semibold mt-1">Which resources did you use? (Select all)</h2>
-        </div>
 
-        <div class="space-y-2">
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="checkbox" class="accent-indigo-500" />
-                <span>Lecture slides</span>
-            </label>
 
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="checkbox" class="accent-indigo-500" />
-                <span>Recorded videos</span>
-            </label>
+    </div>
+    </div>
 
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="checkbox" class="accent-indigo-500" />
-                <span>Lab sessions</span>
-            </label>
 
-            <label class="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 cursor-pointer hover:bg-slate-900/60">
-                <input type="checkbox" class="accent-indigo-500" />
-                <span>External websites</span>
-            </label>
+
+
+
         </div>
     </div>
 
@@ -112,70 +47,15 @@
         <div>
             <p class="text-xs text-slate-400">Open text</p>
             <h2 class="text-lg font-semibold mt-1">What should we improve?</h2>
-        </div>
+</div>
 
-        <textarea rows="4"
-                  class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Write your feedback..."></textarea>
 
-        <p class="text-xs text-slate-500">Keep it short and helpful.</p>
-    </div>
 
-    <!-- Question 4: Rating scale -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Rating scale</p>
-            <h2 class="text-lg font-semibold mt-1">Rate the teaching quality (1–5)</h2>
-        </div>
 
-        <div class="grid grid-cols-5 gap-2">
-            <button type="button" class="py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">1</button>
-            <button type="button" class="py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">2</button>
-            <button type="button" class="py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">3</button>
-            <button type="button" class="py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">4</button>
-            <button type="button" class="py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">5</button>
-        </div>
 
-        <p class="text-xs text-slate-500">Later: backend can highlight selected number.</p>
-    </div>
 
-    <!-- Question 5: Ranking (placeholder UI) -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Ranking</p>
-            <h2 class="text-lg font-semibold mt-1">Rank these features (top = most important)</h2>
-        </div>
 
-        <div class="space-y-2">
-            <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-3 flex items-center justify-between">
-                <span>Lab support</span>
-                <span class="text-xs text-slate-500">Drag later</span>
-            </div>
-            <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-3 flex items-center justify-between">
-                <span>Lecture clarity</span>
-                <span class="text-xs text-slate-500">Drag later</span>
-            </div>
-            <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-3 flex items-center justify-between">
-                <span>Coursework feedback</span>
-                <span class="text-xs text-slate-500">Drag later</span>
-            </div>
-        </div>
 
-        <p class="text-xs text-slate-500">Later: we can implement drag-and-drop with JS.</p>
-    </div>
 
-    <!-- Minimal bottom action -->
-    <div class="flex gap-3 justify-end pt-2">
-        <a asp-page="/User/Dashboard"
-           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
-            Back
-        </a>
 
-        <a asp-page="/Poll/Thanks"
-           class="px-5 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium
-                  shadow-[0_0_25px_rgba(99,102,241,0.35)]">
-            Submit
-        </a>
-    </div>
 
-</section>

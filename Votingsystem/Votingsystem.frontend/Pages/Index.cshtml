@@ -5,29 +5,58 @@
 }
 
 @*
-    LANDING PAGE (PUBLIC)
-    ---------------------
-    First page everyone sees.
-
-    Two actions only:
-    - Login
-    - Create account (Register)
-
-    IMPORTANT:
-    - These are <a asp-page="..."> links, not buttons.
-    - Links always work in frontend-only mode.
+  LANDING PAGE (PUBLIC)
+  - Join via Session ID (main action)
+  - Login / Register
+  - Frontend-only session flow:
+      If not logged in -> store pending session -> redirect login
+      If logged in -> go straight to Poll/Take?session=...
 *@
 
 <section class="min-h-[70vh] flex items-center justify-center">
     <div class="w-full max-w-xl text-center space-y-8">
 
         <!-- Title -->
-        <div class="space-y-3">
-            <h1 class="text-3xl sm:text-4xl font-semibold tracking-tight">
-                PersianBits Voting Centre
-            </h1>
-            <p class="text-slate-400">
-                Simple voting for users. Powerful control for creators.
+        <div class="space-y-6 flex flex-col items-center">
+
+            <!-- Large Logo -->
+            <div class="pb-hero-logo">
+                <img src="~/assets/logo.jpg" alt="PersianBits logo" />
+            </div>
+
+            <!-- Title -->
+            <div class="space-y-3 text-center">
+                <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight">
+                    PersianBits Voting Centre
+                </h1>
+                <p class="text-slate-400">
+                    Secure. Modern. Transparent Elections.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- JOIN via session -->
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-3 text-left">
+            <p class="text-sm text-slate-300 font-medium">Join an election / poll</p>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input id="sessionInput"
+                       class="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                       placeholder="Enter Session ID (e.g. 7F2A-19KD)" />
+
+                <button id="joinBtn" type="button"
+                        class="px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-semibold
+                               shadow-[0_0_30px_rgba(99,102,241,0.35)] transition">
+                    Join
+                </button>
+            </div>
+
+            <p id="joinError" class="hidden text-sm text-rose-300"></p>
+
+            <p class="text-xs text-slate-500">
+                If you’re not logged in, you’ll be asked to sign in first, then we’ll take you back into the session.
             </p>
         </div>
 
@@ -36,16 +65,13 @@
 
             <!-- LOGIN -->
             <a asp-page="/Auth/Login"
-               class="block px-5 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-semibold
-                      shadow-[0_0_30px_rgba(99,102,241,0.35)] transition">
+               class="block px-5 py-4 rounded-2xl border border-slate-800 hover:bg-slate-800/40 font-semibold transition">
                 Login
             </a>
 
             <!-- CREATE ACCOUNT -->
             <a asp-page="/Auth/Register/Index"
-               class="block px-5 py-4 rounded-2xl border border-indigo-500/60 text-indigo-200
-                      hover:bg-indigo-500/10 transition
-                      shadow-[0_0_25px_rgba(99,102,241,0.22)]">
+               class="block px-5 py-4 rounded-2xl border border-slate-800 hover:bg-slate-800/40 font-semibold transition">
                 Create account
             </a>
 
@@ -57,3 +83,38 @@
 
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        (() => {
+          const input = document.getElementById("sessionInput");
+          const btn = document.getElementById("joinBtn");
+          const err = document.getElementById("joinError");
+
+          const isLoggedIn = () => localStorage.getItem("pb_isLoggedIn") === "true";
+
+          btn.addEventListener("click", () => {
+            err.classList.add("hidden");
+            err.textContent = "";
+
+            const session = (input.value || "").trim();
+            if (!session) {
+              err.textContent = "Please enter a Session ID.";
+              err.classList.remove("hidden");
+              return;
+            }
+
+            // store pending session so login/register can continue the flow
+            localStorage.setItem("pb_pendingSession", session);
+
+            if (!isLoggedIn()) {
+              window.location.href = "/Auth/Login";
+              return;
+            }
+
+            // already logged in -> go directly
+            window.location.href = `/Poll/Take?session=${encodeURIComponent(session)}`;
+          });
+        })();
+    </script>
+}

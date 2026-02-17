@@ -1,0 +1,217 @@
+@page
+@model VotingSystem.Frontend.Pages.Admin.ProfileModel
+@{
+    ViewData["Title"] = "Admin Profile";
+}
+
+<section class="max-w-3xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">Admin Profile</h1>
+            <p style="color: var(--pb-muted);">Your account overview and admin stats.</p>
+        </div>
+        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm">Back</a>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="pb-card p-8">
+        <div class="flex flex-col items-center text-center space-y-4">
+
+            <!-- Avatar -->
+            <div id="profileAvatar" style="
+                width: 96px; height: 96px; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 2.5rem;
+                background: var(--pb-avatarBg); border: 2px solid var(--pb-gold);
+                box-shadow: var(--pb-shadowGlow);
+            "></div>
+
+            <!-- Name & Role -->
+            <div>
+                <h2 id="profileName" class="text-xl font-bold" style="color: var(--pb-text);"></h2>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                    <span class="pb-badge pb-badge-gold">Admin</span>
+                    <span class="pb-badge pb-badge-success">Verified Creator</span>
+                </div>
+            </div>
+
+            <!-- Change Avatar Button -->
+            <button id="changeAvatarBtn" class="pb-btn pb-btn-outline text-sm">
+                Change Avatar
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid sm:grid-cols-3 gap-4">
+        <div class="pb-stat-card text-center">
+            <p class="pb-stat-label">Elections Created</p>
+            <p class="pb-stat-value">6</p>
+        </div>
+        <div class="pb-stat-card text-center">
+            <p class="pb-stat-label">Total Votes</p>
+            <p class="pb-stat-value">284</p>
+        </div>
+        <div class="pb-stat-card text-center">
+            <p class="pb-stat-label">Active Now</p>
+            <p class="pb-stat-value">2</p>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="pb-card p-6 space-y-5">
+        <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Account Details</h3>
+
+        <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Full Name</span>
+                <span id="infoName" class="font-medium" style="color: var(--pb-text);"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Email</span>
+                <span id="infoEmail" class="font-medium" style="color: var(--pb-text);"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Date of Birth</span>
+                <span id="infoDob" class="font-medium" style="color: var(--pb-text);"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Account Type</span>
+                <span class="pb-badge pb-badge-gold">Admin / Creator</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Card -->
+    <div class="pb-card p-6 space-y-4">
+        <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Recent Activity</h3>
+
+        <div class="pb-row p-4 flex items-center gap-4">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--pb-gold); flex-shrink: 0;"></div>
+            <div>
+                <p class="text-sm font-medium" style="color: var(--pb-text);">Created "Student Council Election"</p>
+                <p class="text-xs" style="color: var(--pb-muted2);">1 hour ago</p>
+            </div>
+        </div>
+
+        <div class="pb-row p-4 flex items-center gap-4">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--pb-success); flex-shrink: 0;"></div>
+            <div>
+                <p class="text-sm font-medium" style="color: var(--pb-text);">Approved Ali Rezaei as creator</p>
+                <p class="text-xs" style="color: var(--pb-muted2);">3 hours ago</p>
+            </div>
+        </div>
+
+        <div class="pb-row p-4 flex items-center gap-4">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--pb-blue); flex-shrink: 0;"></div>
+            <div>
+                <p class="text-sm font-medium" style="color: var(--pb-text);">Started "Student Satisfaction Survey"</p>
+                <p class="text-xs" style="color: var(--pb-muted2);">Yesterday</p>
+            </div>
+        </div>
+
+        <p class="text-xs" style="color: var(--pb-muted2);">
+            Activity is mock data. Backend will load real history later.
+        </p>
+    </div>
+
+</section>
+
+<!-- Avatar Picker Modal -->
+<div id="avatarModal" style="
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 50;
+    align-items: center; justify-content: center; padding: 1rem;
+">
+    <div class="pb-card p-6 space-y-4" style="max-width: 420px; width: 100%;">
+        <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Choose your avatar</h3>
+        <div id="avatarGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;"></div>
+        <div class="flex justify-end gap-2 pt-2">
+            <button id="avatarRandomBtn" class="pb-btn pb-btn-outline text-sm">Shuffle</button>
+            <button id="avatarCloseBtn" class="pb-btn pb-btn-outline text-sm">Close</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+          const avatarEmojis = [
+            '😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼',
+            '🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸',
+            '🌻','⭐','🔥','💎','🎯','🎮','🎨','🎵','🚀','🏆',
+            '🎭','🎪','🧊','🌈','🍀','🎲','👻','🤖','👽','🧙',
+            '🧛','🦸','🥷','🧑‍🚀','🧑‍🎨','🧑‍💻','🦝','🐧','🦜','🐢'
+          ];
+
+          function getAvatar() {
+            let av = localStorage.getItem('pb_avatar');
+            if (!av) {
+              av = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+              localStorage.setItem('pb_avatar', av);
+            }
+            return av;
+          }
+
+          const name = localStorage.getItem('pb_userName') || 'Admin';
+          const email = localStorage.getItem('pb_userEmail') || 'admin@example.com';
+          const dob = localStorage.getItem('pb_userDob') || '';
+
+          document.getElementById('profileAvatar').textContent = getAvatar();
+          document.getElementById('profileName').textContent = name;
+          document.getElementById('infoName').textContent = name;
+          document.getElementById('infoEmail').textContent = email;
+          document.getElementById('infoDob').textContent = dob || 'Not set';
+
+          // Avatar picker
+          const modal = document.getElementById('avatarModal');
+          const grid = document.getElementById('avatarGrid');
+
+          function renderGrid() {
+            grid.innerHTML = '';
+            const shuffled = [...avatarEmojis].sort(() => Math.random() - 0.5).slice(0, 24);
+            shuffled.forEach(emoji => {
+              const btn = document.createElement('button');
+              btn.textContent = emoji;
+              btn.style.cssText = `
+                width: 48px; height: 48px; border-radius: 12px; font-size: 1.5rem;
+                background: var(--pb-glass2); border: 1px solid var(--pb-border2);
+                cursor: pointer; transition: all 0.15s ease;
+                display: flex; align-items: center; justify-content: center;
+              `;
+              btn.addEventListener('mouseenter', () => {
+                btn.style.background = 'var(--pb-goldSubtle)';
+                btn.style.borderColor = 'var(--pb-gold)';
+                btn.style.transform = 'scale(1.15)';
+              });
+              btn.addEventListener('mouseleave', () => {
+                btn.style.background = 'var(--pb-glass2)';
+                btn.style.borderColor = 'var(--pb-border2)';
+                btn.style.transform = 'scale(1)';
+              });
+              btn.addEventListener('click', () => {
+                localStorage.setItem('pb_avatar', emoji);
+                document.getElementById('profileAvatar').textContent = emoji;
+                modal.style.display = 'none';
+                const navAv = document.getElementById('navAvatar');
+                if (navAv) navAv.textContent = emoji;
+              });
+              grid.appendChild(btn);
+            });
+          }
+
+          document.getElementById('changeAvatarBtn').addEventListener('click', () => {
+            renderGrid();
+            modal.style.display = 'flex';
+          });
+          document.getElementById('avatarRandomBtn').addEventListener('click', renderGrid);
+          document.getElementById('avatarCloseBtn').addEventListener('click', () => modal.style.display = 'none');
+          modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+        })();
+    </script>
+}

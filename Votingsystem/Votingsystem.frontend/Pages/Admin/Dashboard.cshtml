@@ -28,15 +28,14 @@
     <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-semibold">Admin Dashboard</h1>
-            <p class="text-slate-400 mt-1">Manage polls, sessions, invites, and participants.</p>
+            <p class="text-slate-400 mt-1">Manage your elections and participate in others.</p>
         </div>
 
         <!-- Primary actions -->
         <div class="flex gap-2">
             <a asp-page="/Admin/CreatePoll"
-               class="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium
-                      shadow-[0_0_25px_rgba(99,102,241,0.35)]">
-                Create Poll
+               class="px-4 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium">
+                Create Election
             </a>
 
             <a asp-page="/Admin/Users"
@@ -47,7 +46,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
             <p class="text-sm text-slate-400">Total polls</p>
             <p class="text-3xl font-semibold mt-2">6</p>
@@ -66,58 +65,96 @@
         <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
             <p class="text-sm text-slate-400">Invites sent</p>
             <p class="text-3xl font-semibold mt-2">18</p>
-        </div>
+    </div>
     </div>
 
-    <!-- Poll list -->
+    <!-- Poll List -->
     <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-lg">Polls</h2>
-            <span class="text-xs text-slate-400">Mock data (frontend prototype)</span>
+            <h2 class="font-semibold text-lg">Your Elections</h2>
+            <span class="text-xs text-slate-400">Mock data</span>
         </div>
 
-        <!-- Poll item -->
-        <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <p class="font-medium">Student Satisfaction Survey</p>
-                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
-                        Running
-                    </span>
+        <!-- Poll Item -->
+        <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <p class="font-medium">Student Satisfaction Survey</p>
+                        <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
+                            Running
+                        </span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Election • 148 participants
+                    </p>
                 </div>
-                <p class="text-sm text-slate-400">Mixed: MCQ + Text • 148 submissions</p>
+
+                <div class="flex flex-wrap gap-2">
+                    <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        Stop
+                    </button>
+
+                    <button type="button"
+                            onclick="toggleShare('share1')"
+                            class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        Share
+                    </button>
+
+                    <button class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
+                        Delete
+                    </button>
+                </div>
             </div>
 
-            <div class="flex flex-wrap gap-2">
-                <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">Stop</button>
-                <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">Share</button>
-                <button class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
-                    Delete
-                </button>
+            <!-- Share Panel -->
+            <div id="share1" class="hidden rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+                <p class="text-sm text-slate-300 font-medium">Share this election</p>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input readonly
+                           value="https://persianbits.app/join/7F2A-19KD"
+                           class="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm" />
+
+                    <button class="px-4 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 text-sm font-medium">
+                        Copy Link
+                    </button>
+                </div>
+
+                <div class="text-sm text-slate-400">
+                    Session ID: <span class="font-semibold text-slate-200">7F2A-19KD</span>
+                </div>
             </div>
         </div>
 
-        <!-- Poll item -->
-        <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <p class="font-medium">Best Module Vote</p>
-                    <span class="text-xs px-2 py-1 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30">
-                        Draft
-                    </span>
+        <!-- Poll Item -->
+        <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <p class="font-medium">Best Module Vote</p>
+                        <span class="text-xs px-2 py-1 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30">
+                            Draft
+                        </span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Election • 0 participants
+                    </p>
                 </div>
-                <p class="text-sm text-slate-400">Single choice • 0 submissions</p>
-            </div>
 
-            <div class="flex flex-wrap gap-2">
-                <button class="px-3 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium text-sm">
-                    Start
-                </button>
-                <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">Edit</button>
-                <button class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
-                    Delete
-                </button>
-            </div>
+                <div class="flex flex-wrap gap-2">
+                    <button class="px-3 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium text-sm">
+                        Start
+                    </button>
+
+                    <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        Edit
+                    </button>
+
+                    <button class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
+                        Delete
+                    </button>
+                </div>
         </div>
 
         <!-- Poll item -->
@@ -138,48 +175,60 @@
                     View results
                 </a>
                 <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">Share</button>
-            </div>
         </div>
-
     </div>
 
-    <!-- Share / Join info panel -->
-    <div class="grid lg:grid-cols-3 gap-4">
-        <div class="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-            <h2 class="font-semibold text-lg">Share a poll (UI only)</h2>
-
-            <div class="space-y-2">
-                <p class="text-sm text-slate-400">Invitation link</p>
-                <div class="flex gap-2">
-                    <input class="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800"
-                           value="https://persianbits.app/join/7F2A-19KD" readonly />
-                    <button class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
-                        Copy
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid sm:grid-cols-2 gap-3">
-                <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                    <p class="text-sm text-slate-400">Session ID</p>
-                    <p class="text-xl font-semibold mt-2">7F2A-19KD</p>
-                </div>
-
-                <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                    <p class="text-sm text-slate-400">Status</p>
-                    <p class="text-xl font-semibold mt-2">Running</p>
-                </div>
-            </div>
+    <!-- Join Another Admin's Poll -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-lg">Join another admin’s election</h2>
+            <span class="text-xs text-slate-400">Participate as a voter</span>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-3">
-            <h2 class="font-semibold text-lg">QR Code</h2>
-            <p class="text-sm text-slate-400">Placeholder until backend generates QR.</p>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <input id="adminJoinSession"
+                   class="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+                          focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="Enter Session ID (e.g. 7F2A-19KD)" />
 
-            <div class="aspect-square rounded-xl border border-dashed border-slate-700 bg-slate-950/40 flex items-center justify-center text-slate-500">
-                QR
-            </div>
+            <button id="adminJoinBtn"
+                    class="px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-semibold">
+                Join
+            </button>
         </div>
+            </div>
+
+        <p id="adminJoinError" class="hidden text-sm text-rose-300"></p>
     </div>
 
 </section>
+
+@section Scripts {
+    <script>
+        function toggleShare(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle("hidden");
+        }
+
+        (() => {
+          const input = document.getElementById("adminJoinSession");
+          const btn = document.getElementById("adminJoinBtn");
+          const err = document.getElementById("adminJoinError");
+
+          btn?.addEventListener("click", () => {
+            err.classList.add("hidden");
+            err.textContent = "";
+
+            const session = (input.value || "").trim();
+            if (!session) {
+              err.textContent = "Please enter a Session ID.";
+              err.classList.remove("hidden");
+              return;
+            }
+
+            window.location.href = `/Poll/Take?session=${encodeURIComponent(session)}`;
+          });
+        })();
+    </script>
+}
