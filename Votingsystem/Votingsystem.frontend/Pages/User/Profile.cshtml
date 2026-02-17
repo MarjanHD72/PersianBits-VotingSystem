@@ -1,0 +1,231 @@
+@page
+@model VotingSystem.Frontend.Pages.User.ProfileModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<section class="max-w-3xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">My Profile</h1>
+            <p style="color: var(--pb-muted);">View and manage your account information.</p>
+        </div>
+        <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline text-sm">Back</a>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="pb-card p-8">
+        <div class="flex flex-col items-center text-center space-y-4">
+
+            <!-- Avatar -->
+            <div id="profileAvatar" style="
+                width: 96px; height: 96px; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 2.5rem;
+                background: var(--pb-avatarBg); border: 2px solid var(--pb-avatarBdr);
+                box-shadow: var(--pb-shadowGlow);
+            "></div>
+
+            <!-- Name & Role -->
+            <div>
+                <h2 id="profileName" class="text-xl font-bold" style="color: var(--pb-text);"></h2>
+                <p id="profileRole" class="text-sm mt-1" style="color: var(--pb-muted);"></p>
+            </div>
+
+            <!-- Change Avatar Button -->
+            <button id="changeAvatarBtn" class="pb-btn pb-btn-outline text-sm">
+                Change Avatar
+            </button>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="pb-card p-6 space-y-5">
+        <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Account Details</h3>
+
+        <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Full Name</span>
+                <span id="infoName" class="font-medium" style="color: var(--pb-text);"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Email</span>
+                <span id="infoEmail" class="font-medium" style="color: var(--pb-text);"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Date of Birth</span>
+                <span id="infoDob" class="font-medium" style="color: var(--pb-text);"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Account Type</span>
+                <span id="infoType"></span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span class="text-sm font-medium" style="color: var(--pb-muted2);">Creator Request</span>
+                <span id="infoCreatorReq"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Card -->
+    <div class="pb-card p-6 space-y-4">
+        <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Recent Activity</h3>
+
+        <div class="pb-row p-4 flex items-center gap-4">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--pb-success); flex-shrink: 0;"></div>
+            <div>
+                <p class="text-sm font-medium" style="color: var(--pb-text);">Voted in Student Satisfaction Survey</p>
+                <p class="text-xs" style="color: var(--pb-muted2);">2 hours ago</p>
+            </div>
+        </div>
+
+        <div class="pb-row p-4 flex items-center gap-4">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--pb-gold); flex-shrink: 0;"></div>
+            <div>
+                <p class="text-sm font-medium" style="color: var(--pb-text);">Joined session 7F2A-19KD</p>
+                <p class="text-xs" style="color: var(--pb-muted2);">Yesterday</p>
+            </div>
+        </div>
+
+        <div class="pb-row p-4 flex items-center gap-4">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--pb-blue); flex-shrink: 0;"></div>
+            <div>
+                <p class="text-sm font-medium" style="color: var(--pb-text);">Account created</p>
+                <p class="text-xs" style="color: var(--pb-muted2);">3 days ago</p>
+            </div>
+        </div>
+
+        <p class="text-xs" style="color: var(--pb-muted2);">
+            Activity is mock data. Backend will load real history later.
+        </p>
+    </div>
+
+</section>
+
+<!-- Avatar Picker Modal -->
+<div id="avatarModal" style="
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 50;
+    align-items: center; justify-content: center; padding: 1rem;
+">
+    <div class="pb-card p-6 space-y-4" style="max-width: 420px; width: 100%;">
+        <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Choose your avatar</h3>
+        <div id="avatarGrid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;"></div>
+        <div class="flex justify-end gap-2 pt-2">
+            <button id="avatarRandomBtn" class="pb-btn pb-btn-outline text-sm">Shuffle</button>
+            <button id="avatarCloseBtn" class="pb-btn pb-btn-outline text-sm">Close</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+          // ===== AVATAR SYSTEM =====
+          const avatarEmojis = [
+            '😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼',
+            '🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸',
+            '🌻','⭐','🔥','💎','🎯','🎮','🎨','🎵','🚀','🏆',
+            '🎭','🎪','🧊','🌈','🍀','🎲','👻','🤖','👽','🧙',
+            '🧛','🦸','🥷','🧑‍🚀','🧑‍🎨','🧑‍💻','🦝','🐧','🦜','🐢'
+          ];
+
+          function getAvatar() {
+            let av = localStorage.getItem('pb_avatar');
+            if (!av) {
+              av = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+              localStorage.setItem('pb_avatar', av);
+            }
+            return av;
+          }
+
+          // Populate profile
+          const name = localStorage.getItem('pb_userName') || 'User';
+          const email = localStorage.getItem('pb_userEmail') || 'user@example.com';
+          const dob = localStorage.getItem('pb_userDob') || '';
+          const isCreator = localStorage.getItem('pb_isApprovedCreator') === 'true';
+          const reqCreator = localStorage.getItem('pb_requestedCreator') === 'true';
+
+          document.getElementById('profileAvatar').textContent = getAvatar();
+          document.getElementById('profileName').textContent = name;
+          document.getElementById('profileRole').textContent = isCreator ? 'Admin / Creator' : 'Voter';
+          document.getElementById('infoName').textContent = name;
+          document.getElementById('infoEmail').textContent = email;
+          document.getElementById('infoDob').textContent = dob || 'Not set';
+
+          const typeEl = document.getElementById('infoType');
+          if (isCreator) {
+            typeEl.innerHTML = '<span class="pb-badge pb-badge-gold">Admin / Creator</span>';
+          } else {
+            typeEl.innerHTML = '<span class="pb-badge pb-badge-draft">Voter</span>';
+          }
+
+          const reqEl = document.getElementById('infoCreatorReq');
+          if (isCreator) {
+            reqEl.innerHTML = '<span class="pb-badge pb-badge-success">Approved</span>';
+          } else if (reqCreator) {
+            reqEl.innerHTML = '<span class="pb-badge pb-badge-warning">Pending</span>';
+          } else {
+            reqEl.innerHTML = '<span style="color: var(--pb-muted2); font-size: 0.875rem;">Not requested</span>';
+          }
+
+          // Avatar picker modal
+          const modal = document.getElementById('avatarModal');
+          const grid = document.getElementById('avatarGrid');
+
+          function renderGrid() {
+            grid.innerHTML = '';
+            const shuffled = [...avatarEmojis].sort(() => Math.random() - 0.5).slice(0, 24);
+            shuffled.forEach(emoji => {
+              const btn = document.createElement('button');
+              btn.textContent = emoji;
+              btn.style.cssText = `
+                width: 48px; height: 48px; border-radius: 12px; font-size: 1.5rem;
+                background: var(--pb-glass2); border: 1px solid var(--pb-border2);
+                cursor: pointer; transition: all 0.15s ease;
+                display: flex; align-items: center; justify-content: center;
+              `;
+              btn.addEventListener('mouseenter', () => {
+                btn.style.background = 'var(--pb-goldSubtle)';
+                btn.style.borderColor = 'var(--pb-gold)';
+                btn.style.transform = 'scale(1.15)';
+              });
+              btn.addEventListener('mouseleave', () => {
+                btn.style.background = 'var(--pb-glass2)';
+                btn.style.borderColor = 'var(--pb-border2)';
+                btn.style.transform = 'scale(1)';
+              });
+              btn.addEventListener('click', () => {
+                localStorage.setItem('pb_avatar', emoji);
+                document.getElementById('profileAvatar').textContent = emoji;
+                modal.style.display = 'none';
+                // Update nav avatar too
+                const navAv = document.getElementById('navAvatar');
+                if (navAv) navAv.textContent = emoji;
+              });
+              grid.appendChild(btn);
+            });
+          }
+
+          document.getElementById('changeAvatarBtn').addEventListener('click', () => {
+            renderGrid();
+            modal.style.display = 'flex';
+          });
+
+          document.getElementById('avatarRandomBtn').addEventListener('click', renderGrid);
+          document.getElementById('avatarCloseBtn').addEventListener('click', () => {
+            modal.style.display = 'none';
+          });
+
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+          });
+        })();
+    </script>
+}
