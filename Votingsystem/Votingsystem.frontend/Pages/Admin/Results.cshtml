@@ -4,76 +4,186 @@
     ViewData["Title"] = "Results";
 }
 
+@*
+  RESULTS PAGE
+  Reads ?type= from query string to show the right layout:
+    - election  → candidate bar chart (default)
+    - rating    → star/scale breakdown
+    - text      → list of submitted text responses
+*@
+
 <section class="max-w-4xl mx-auto space-y-6">
     <div class="flex items-start justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-semibold">Results</h1>
-            <p class="text-slate-400 mt-1">Frontend prototype. Backend will load real results later.</p>
+            <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">Results</h1>
+            <p id="resultSubtitle" style="color: var(--pb-muted);" class="mt-1"></p>
         </div>
 
-        <a asp-page="/Admin/Dashboard"
-           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
-            Back
-        </a>
+        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm">Back</a>
     </div>
 
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-5">
-        <h2 class="text-lg font-semibold">Event Feedback</h2>
-
-        <div class="space-y-3">
-            <div>
-                <div class="flex justify-between text-sm">
-                    <span class="font-medium">5 Stars</span>
-                    <span class="text-slate-400">42%</span>
-                </div>
-                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-3 w-[42%] bg-[#D4AF37]"></div>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex justify-between text-sm">
-                    <span class="font-medium">4 Stars</span>
-                    <span class="text-slate-400">31%</span>
-                </div>
-                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-3 w-[31%] bg-[#D4AF37]"></div>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex justify-between text-sm">
-                    <span class="font-medium">3 Stars</span>
-                    <span class="text-slate-400">17%</span>
-                </div>
-                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-3 w-[17%] bg-[#D4AF37]"></div>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex justify-between text-sm">
-                    <span class="font-medium">2 Stars</span>
-                    <span class="text-slate-400">7%</span>
-                </div>
-                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-3 w-[7%] bg-[#D4AF37]"></div>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex justify-between text-sm">
-                    <span class="font-medium">1 Star</span>
-                    <span class="text-slate-400">3%</span>
-                </div>
-                <div class="mt-2 h-3 rounded-full bg-slate-800 overflow-hidden">
-                    <div class="h-3 w-[3%] bg-[#D4AF37]"></div>
-                </div>
-            </div>
+    <!-- Election Results -->
+    <div id="electionResults" style="display:none;" class="pb-card p-6 space-y-5">
+        <div class="flex items-center justify-between">
+            <h2 id="electionTitle" class="text-lg font-semibold" style="color: var(--pb-text);"></h2>
+            <span class="pb-badge pb-badge-success">Election</span>
         </div>
 
-        <p class="text-xs text-slate-500">
-            Later: this page will show real-time updates and export options.
-        </p>
+        <div class="space-y-4" id="electionBars"></div>
+
+        <div class="flex items-center justify-between pt-3" style="border-top: 1px solid var(--pb-border2);">
+            <span style="color: var(--pb-muted2); font-size: 0.85rem;" id="electionTotal"></span>
+            <span class="pb-badge pb-badge-draft" id="electionWinner"></span>
+        </div>
     </div>
+
+    <!-- Rating Results -->
+    <div id="ratingResults" style="display:none;" class="pb-card p-6 space-y-5">
+        <div class="flex items-center justify-between">
+            <h2 id="ratingTitle" class="text-lg font-semibold" style="color: var(--pb-text);"></h2>
+            <span class="pb-badge pb-badge-warning">Rating Scale</span>
+        </div>
+
+        <!-- Average -->
+        <div class="text-center pb-4" style="border-bottom: 1px solid var(--pb-border2);">
+            <p id="ratingAvg" style="font-size: 3rem; font-weight: 800; color: var(--pb-gold); line-height: 1;"></p>
+            <p style="color: var(--pb-muted2); font-size: 0.85rem; margin-top: 4px;" id="ratingAvgLabel"></p>
+        </div>
+
+        <div class="space-y-3" id="ratingBars"></div>
+
+        <span style="color: var(--pb-muted2); font-size: 0.85rem;" id="ratingTotal"></span>
+    </div>
+
+    <!-- Text Response Results -->
+    <div id="textResults" style="display:none;" class="space-y-4">
+        <div class="pb-card p-6">
+            <div class="flex items-center justify-between">
+                <h2 id="textTitle" class="text-lg font-semibold" style="color: var(--pb-text);"></h2>
+                <span class="pb-badge pb-badge-gold">Text Responses</span>
+            </div>
+            <p style="color: var(--pb-muted2); font-size: 0.85rem; margin-top: 8px;" id="textCount"></p>
+        </div>
+
+        <div class="space-y-3" id="textList"></div>
+    </div>
+
+    <p class="text-xs" style="color: var(--pb-muted2);">
+        Mock data. Backend will load real results and support export later.
+    </p>
 </section>
+
+@section Scripts {
+    <script>
+        (() => {
+          const params = new URLSearchParams(window.location.search);
+          const type = params.get('type') || 'election';
+          const name = params.get('name') || 'Untitled';
+
+          document.getElementById('resultSubtitle').textContent = `Viewing results for "${decodeURIComponent(name)}"`;
+
+          // ===== ELECTION =====
+          if (type === 'election') {
+            const el = document.getElementById('electionResults');
+            el.style.display = 'block';
+            document.getElementById('electionTitle').textContent = decodeURIComponent(name);
+
+            const candidates = [
+              { name: 'Sara Mohammadi', votes: 87, color: 'var(--pb-gold)' },
+              { name: 'Ali Rezaei', votes: 64, color: 'var(--pb-blue)' },
+              { name: 'Mina Farhadi', votes: 52, color: 'var(--pb-purple)' },
+            ];
+            const total = candidates.reduce((s, c) => s + c.votes, 0);
+            const winner = candidates.reduce((a, b) => a.votes > b.votes ? a : b);
+
+            const barsEl = document.getElementById('electionBars');
+            candidates.forEach((c, i) => {
+              const pct = Math.round((c.votes / total) * 100);
+              const isWinner = c.name === winner.name;
+              barsEl.innerHTML += `
+                <div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:baseline;">
+                    <span style="font-weight:600; color:var(--pb-text); font-size:0.95rem;">
+                      ${isWinner ? '👑 ' : ''}${c.name}
+                    </span>
+                    <span style="color:var(--pb-muted2); font-size:0.85rem;">${c.votes} votes · ${pct}%</span>
+                  </div>
+                  <div class="pb-progress">
+                    <div class="pb-progress-fill" style="width:${pct}%; background:${c.color};"></div>
+                  </div>
+                </div>`;
+            });
+
+            document.getElementById('electionTotal').textContent = `Total: ${total} votes`;
+            document.getElementById('electionWinner').textContent = `Winner: ${winner.name}`;
+          }
+
+          // ===== RATING =====
+          if (type === 'rating') {
+            const el = document.getElementById('ratingResults');
+            el.style.display = 'block';
+            document.getElementById('ratingTitle').textContent = decodeURIComponent(name);
+
+            const ratings = [
+              { label: '5 Stars', stars: '★★★★★', count: 42, pct: 42 },
+              { label: '4 Stars', stars: '★★★★☆', count: 31, pct: 31 },
+              { label: '3 Stars', stars: '★★★☆☆', count: 17, pct: 17 },
+              { label: '2 Stars', stars: '★★☆☆☆', count: 7,  pct: 7 },
+              { label: '1 Star',  stars: '★☆☆☆☆', count: 3,  pct: 3 },
+            ];
+            const total = ratings.reduce((s, r) => s + r.count, 0);
+            const avg = ratings.reduce((s, r, i) => s + (5 - i) * r.count, 0) / total;
+
+            document.getElementById('ratingAvg').textContent = avg.toFixed(1);
+            document.getElementById('ratingAvgLabel').textContent = `Average from ${total} responses`;
+
+            const barsEl = document.getElementById('ratingBars');
+            ratings.forEach(r => {
+              barsEl.innerHTML += `
+                <div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.875rem;">
+                    <span style="color:var(--pb-gold);">${r.stars}</span>
+                    <span style="color:var(--pb-muted2);">${r.count} (${r.pct}%)</span>
+                  </div>
+                  <div class="pb-progress">
+                    <div class="pb-progress-fill" style="width:${r.pct}%;"></div>
+                  </div>
+                </div>`;
+            });
+
+            document.getElementById('ratingTotal').textContent = `Total: ${total} responses`;
+          }
+
+          // ===== TEXT =====
+          if (type === 'text') {
+            const el = document.getElementById('textResults');
+            el.style.display = 'block';
+            document.getElementById('textTitle').textContent = decodeURIComponent(name);
+
+            const responses = [
+              { user: 'Mamad S.', time: '2 hours ago', text: 'The event was really well organized. I especially liked the networking session and the panel discussion on AI ethics.' },
+              { user: 'Sara M.', time: '3 hours ago', text: 'Good overall but the venue was too small for the number of attendees. Audio quality could be improved.' },
+              { user: 'Ali R.', time: '5 hours ago', text: 'Excellent speakers and great food. Would definitely attend again next year.' },
+              { user: 'Mina F.', time: '6 hours ago', text: 'I think the schedule was too packed. Breaks between sessions would help.' },
+              { user: 'Reza K.', time: '1 day ago', text: 'Best university event I have been to. The student council did an amazing job putting this together.' },
+              { user: 'Nazanin T.', time: '1 day ago', text: 'More hands-on workshops would be great for future events.' },
+            ];
+
+            document.getElementById('textCount').textContent = `${responses.length} responses collected`;
+
+            const listEl = document.getElementById('textList');
+            responses.forEach(r => {
+              listEl.innerHTML += `
+                <div class="pb-card p-5">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-weight:600; color:var(--pb-text); font-size:0.9rem;">${r.user}</span>
+                    <span style="color:var(--pb-muted2); font-size:0.75rem;">${r.time}</span>
+                  </div>
+                  <p style="color:var(--pb-muted); font-size:0.9rem; line-height:1.6; margin:0;">${r.text}</p>
+                </div>`;
+            });
+          }
+
+        })();
+    </script>
+}

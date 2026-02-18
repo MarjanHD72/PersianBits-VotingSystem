@@ -67,6 +67,11 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2">
+                    <a href="/Admin/Results?type=election&name=Student+Satisfaction+Survey"
+                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        Results
+                    </a>
+
                     <button class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
                         Stop
                     </button>
@@ -88,17 +93,24 @@
                 <p class="text-sm text-slate-300 font-medium">Share this election</p>
 
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <input readonly
+                    <input readonly id="shareLink1"
                            value="https://persianbits.app/join/7F2A-19KD"
                            class="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm" />
 
-                    <button class="px-4 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 text-sm font-medium">
+                    <button onclick="copyToClipboard('shareLink1', this)"
+                            class="px-4 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 text-sm font-medium">
                         Copy Link
                     </button>
                 </div>
 
-                <div class="text-sm text-slate-400">
-                    Session ID: <span class="font-semibold text-slate-200">7F2A-19KD</span>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div class="text-sm text-slate-400">
+                        Session ID: <span id="sessionId1" class="font-semibold text-slate-200">7F2A-19KD</span>
+                    </div>
+                    <button onclick="copyText('7F2A-19KD', this)"
+                            class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        Copy Session ID
+                    </button>
                 </div>
             </div>
         </div>
@@ -119,6 +131,11 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2">
+                    <a href="/Admin/Results?type=election&name=Best+Module+Vote"
+                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
+                        Results
+                    </a>
+
                     <button class="px-3 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium text-sm">
                         Start
                     </button>
@@ -165,6 +182,23 @@
             const el = document.getElementById(id);
             if (!el) return;
             el.classList.toggle("hidden");
+        }
+
+        function copyToClipboard(inputId, btn) {
+            const input = document.getElementById(inputId);
+            navigator.clipboard.writeText(input.value).then(() => {
+                const orig = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = orig, 1500);
+            });
+        }
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = orig, 1500);
+            });
         }
 
         (() => {
