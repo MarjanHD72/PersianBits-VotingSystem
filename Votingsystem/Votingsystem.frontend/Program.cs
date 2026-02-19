@@ -1,6 +1,12 @@
+using VotingSystem.Application.Services;
+using VotingSystem.Application.Services.Logging;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<ILoggingService, LoggingService>();
+builder.Services.AddScoped<IPollService, PollService>();
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();

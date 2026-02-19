@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-using VotingSystem.Domain;
-using System.Collections.Generic;
-
 namespace VotingSystem.Application.Services
 {
-   
+    public interface IPollService
+    {
+        void CreatePoll(string title);
+        void Vote(int pollId, int userId);
+    }
 }
-
