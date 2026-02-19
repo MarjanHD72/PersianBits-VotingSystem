@@ -16,7 +16,23 @@ namespace VotingSystem.Application.Services
 
         public void CreatePoll(string title)
         {
-            _logging.LogInfo($"Poll created: {title}");
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                _logging.LogWarning("Attempt to create poll with empty title.");
+                return;
+            }
+
+            try
+            {
+                
+
+                _logging.LogInfo($"Poll created successfully: {title}");
+            }
+            catch (Exception ex)
+            {
+                _logging.LogError($"Error while creating poll '{title}': {ex.Message}");
+                throw;
+            }
         }
 
         public void Vote(int pollId, int userId)
