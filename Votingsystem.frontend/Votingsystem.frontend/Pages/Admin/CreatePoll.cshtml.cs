@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace VotingSystem.Frontend.Pages.Admin;
+namespace Votingsystem.frontend.Pages.Admin;
 
+[Authorize(Roles = "Admin")]
 public class CreatePollModel : PageModel
 {
-    // Frontend-only: UI page. Backend will later handle saving and validation.
     public void OnGet() { }
 }

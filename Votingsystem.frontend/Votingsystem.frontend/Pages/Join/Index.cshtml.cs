@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace VotingSystem.Frontend.Pages.Join;
+namespace Votingsystem.frontend.Pages.Join;
 
 public class IndexModel : PageModel
 {
