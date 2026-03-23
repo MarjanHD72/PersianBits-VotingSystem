@@ -1,0 +1,102 @@
+﻿@page
+@model Votingsystem.frontend.Pages.Admin.ProfileModel
+@{
+    ViewData["Title"] = "Admin Profile";
+}
+
+<section class="max-w-3xl mx-auto space-y-6">
+    <div class="flex items-start justify-between gap-4">
+        <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">Admin Profile</h1>
+        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm">Back</a>
+    </div>
+
+    @if (Model.Profile != null)
+    {
+        <div class="pb-card p-8">
+            <div class="flex flex-col items-center text-center space-y-4">
+                <div style="width:96px; height:96px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+                                font-size:2.5rem; background:var(--pb-avatarBg); border:2px solid var(--pb-gold); box-shadow:var(--pb-shadowGlow);">
+                    @Model.Profile.Avatar
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold" style="color: var(--pb-text);">@Model.Profile.FullName</h2>
+                    <div class="flex items-center justify-center gap-2 mt-2">
+                        <span class="pb-badge pb-badge-gold">Admin</span>
+                    </div>
+                </div>
+                <button type="button" id="changeAvatarBtn" class="pb-btn pb-btn-outline text-sm">Change Avatar</button>
+            </div>
+        </div>
+
+        <div class="grid sm:grid-cols-3 gap-4">
+            <div class="pb-stat-card text-center">
+                <p class="pb-stat-label">Elections</p>
+                <p class="pb-stat-value">@Model.ElectionCount</p>
+            </div>
+            <div class="pb-stat-card text-center">
+                <p class="pb-stat-label">Total Votes</p>
+                <p class="pb-stat-value">@Model.TotalVotes</p>
+            </div>
+            <div class="pb-stat-card text-center">
+                <p class="pb-stat-label">Active</p>
+                <p class="pb-stat-value">@Model.ActiveCount</p>
+            </div>
+        </div>
+
+        <div class="pb-card p-6 space-y-4">
+            <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Account Details</h3>
+            <div class="flex justify-between pb-3" style="border-bottom: 1px solid var(--pb-border2);">
+                <span style="color: var(--pb-muted2); font-size: 0.875rem;">Email</span>
+                <span style="color: var(--pb-text);">@Model.Profile.Email</span>
+            </div>
+            <div class="flex justify-between pb-3" style="border-bottom: 1px solid var(--pb-border2);">
+                <span style="color: var(--pb-muted2); font-size: 0.875rem;">Date of Birth</span>
+                <span style="color: var(--pb-text);">@Model.Profile.DateOfBirth.ToString("MMM dd, yyyy")</span>
+            </div>
+            <div class="flex justify-between">
+                <span style="color: var(--pb-muted2); font-size: 0.875rem;">Joined</span>
+                <span style="color: var(--pb-text);">@Model.Profile.CreatedAt.ToString("MMM dd, yyyy")</span>
+            </div>
+        </div>
+
+        <!-- Avatar Picker Modal -->
+        <div id="avatarModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:50;
+                                         align-items:center; justify-content:center; padding:1rem;">
+            <div class="pb-card p-6 space-y-4" style="max-width:420px; width:100%;">
+                <h3 class="font-semibold text-lg" style="color: var(--pb-text);">Choose your avatar</h3>
+                <div id="avatarGrid" style="display:grid; grid-template-columns:repeat(6,1fr); gap:12px;"></div>
+                <div class="flex justify-end">
+                    <button id="avatarCloseBtn" class="pb-btn pb-btn-outline text-sm">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <form id="avatarForm" method="post" asp-page-handler="Avatar" style="display:none;">
+            <input type="hidden" name="avatar" id="avatarInput" />
+        </form>
+    }
+</section>
+
+@section Scripts {
+    <script>
+        (() => {
+            const emojis = ['😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼','🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸','🌻','⭐','🔥','💎'];
+            const modal = document.getElementById('avatarModal');
+            const grid = document.getElementById('avatarGrid');
+
+            grid.innerHTML = emojis.map(e => `<button type="button" data-emoji="${e}" style="width:48px;height:48px;border-radius:12px;font-size:1.5rem;
+                background:var(--pb-glass2);border:1px solid var(--pb-border2);cursor:pointer;display:flex;align-items:center;justify-content:center;">${e}</button>`).join('');
+
+            grid.addEventListener('click', e => {
+                const btn = e.target.closest('[data-emoji]');
+                if (!btn) return;
+                document.getElementById('avatarInput').value = btn.dataset.emoji;
+                document.getElementById('avatarForm').submit();
+            });
+
+            document.getElementById('changeAvatarBtn')?.addEventListener('click', () => modal.style.display = 'flex');
+            document.getElementById('avatarCloseBtn')?.addEventListener('click', () => modal.style.display = 'none');
+            modal?.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+        })();
+    </script>
+}
