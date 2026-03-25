@@ -1,48 +1,16 @@
 ﻿@page
-@model VotingSystem.Frontend.Pages.Poll.TakeModel
+@model Votingsystem.frontend.Pages.Poll.TakeModel
 @{
-    ViewData["Title"] = "Election";
 }
 
 @*
-  ELECTION-ONLY VOTING PAGE 
-  - Displays candidates with image
-  - Click candidate -> open modal (image + description)
-  - Select exactly one
-  - Submit vote
 *@
 
-<section class="max-w-4xl mx-auto space-y-8">
 
-    <!-- Header -->
     <div class="space-y-2">
-        <p class="text-sm text-slate-400">PersianBits Election</p>
-        <h1 class="text-2xl font-semibold">Student Council Election</h1>
-        <p id="sessionText" class="text-slate-400 text-sm"></p>
     </div>
 
-    <!-- Candidate Grid -->
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        <!-- Candidate Card -->
-        <div class="candidate-card cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/40 p-4 hover:bg-slate-900/70 transition"
-             data-name="Sara Mohammadi"
-             data-desc="Sara focuses on improving academic support, lab accessibility, and transparent communication between students and faculty."
-             data-img="https://images.unsplash.com/photo-1607746882042-944635dfe10e">
-            <img src="https://images.unsplash.com/photo-1607746882042-944635dfe10e"
-                 class="w-full h-48 object-cover rounded-xl mb-3" />
-            <h3 class="font-semibold">Sara Mohammadi</h3>
-            <p class="text-sm text-slate-400 mt-1">Academic reform & student voice</p>
         </div>
-
-        <div class="candidate-card cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/40 p-4 hover:bg-slate-900/70 transition"
-             data-name="Ali Rezaei"
-             data-desc="Ali proposes new tech-driven initiatives and better student feedback systems."
-             data-img="https://images.unsplash.com/photo-1599566150163-29194dcaad36">
-            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36"
-                 class="w-full h-48 object-cover rounded-xl mb-3" />
-            <h3 class="font-semibold">Ali Rezaei</h3>
-            <p class="text-sm text-slate-400 mt-1">Technology & innovation</p>
         </div>
 
         <div class="candidate-card cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/40 p-4 hover:bg-slate-900/70 transition"
@@ -55,107 +23,39 @@
             <p class="text-sm text-slate-400 mt-1">Wellbeing & campus life</p>
         </div>
 
+    <!-- Question 1: Single choice -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
+        <div>
+            <p class="text-xs text-slate-400">Single choice</p>
+            <h2 class="text-lg font-semibold mt-1">How satisfied are you with this module?</h2>
     </div>
 
-    <!-- Selected -->
-    <div id="selectedBox" class="hidden rounded-xl border border-[#D4AF37]/40 bg-[#D4AF37]/10 p-4">
-        <p class="text-sm text-[#D4AF37]">
-            Selected candidate:
-            <span id="selectedName" class="font-semibold"></span>
-        </p>
+
+
+    </div>
     </div>
 
-    <!-- Submit -->
-    <div class="flex justify-end gap-3">
-        <a asp-page="/User/Dashboard"
-           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
-            Back
-        </a>
 
-        <button id="submitVote"
-                class="px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium">
-            Submit Vote
-        </button>
-    </div>
 
-</section>
 
-<!-- Candidate Modal -->
-<div id="candidateModal"
-     class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
 
-    <div class="max-w-lg w-full rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
-        <img id="modalImg" class="w-full h-64 object-cover rounded-xl" />
-        <h2 id="modalName" class="text-xl font-semibold"></h2>
-        <p id="modalDesc" class="text-slate-300 text-sm"></p>
-
-        <div class="flex justify-end gap-3 pt-3">
-            <button id="selectCandidate"
-                    class="px-4 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium">
-                Select
-            </button>
-
-            <button id="closeModal"
-                    class="px-4 py-2 rounded-xl border border-slate-700 hover:bg-slate-800/60">
-                Close
-            </button>
         </div>
     </div>
+
+    <!-- Question 3: Open text -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
+        <div>
+            <p class="text-xs text-slate-400">Open text</p>
+            <h2 class="text-lg font-semibold mt-1">What should we improve?</h2>
 </div>
 
-@section Scripts {
-    <script>
-        (() => {
 
-          // Show session from query
-          const params = new URLSearchParams(window.location.search);
-          const session = params.get("session");
-          const sessionText = document.getElementById("sessionText");
 
-          if (session) {
-            sessionText.textContent = "Session ID: " + session;
-            localStorage.removeItem("pb_pendingSession");
-          }
 
-          let selected = null;
 
-          const modal = document.getElementById("candidateModal");
-          const modalImg = document.getElementById("modalImg");
-          const modalName = document.getElementById("modalName");
-          const modalDesc = document.getElementById("modalDesc");
-          const selectBtn = document.getElementById("selectCandidate");
-          const closeBtn = document.getElementById("closeModal");
 
-          document.querySelectorAll(".candidate-card").forEach(card => {
-            card.addEventListener("click", () => {
-              modalImg.src = card.dataset.img;
-              modalName.textContent = card.dataset.name;
-              modalDesc.textContent = card.dataset.desc;
-              modal.classList.remove("hidden");
-              modal.classList.add("flex");
-            });
-          });
 
-          selectBtn.addEventListener("click", () => {
-            selected = modalName.textContent;
-            document.getElementById("selectedName").textContent = selected;
-            document.getElementById("selectedBox").classList.remove("hidden");
-            modal.classList.add("hidden");
-          });
 
-          closeBtn.addEventListener("click", () => {
-            modal.classList.add("hidden");
-          });
 
-          document.getElementById("submitVote").addEventListener("click", () => {
-            if (!selected) {
-              alert("Please select a candidate before submitting.");
-              return;
-            }
 
-            window.location.href = "/Poll/Thanks";
-          });
 
-        })();
-    </script>
-}

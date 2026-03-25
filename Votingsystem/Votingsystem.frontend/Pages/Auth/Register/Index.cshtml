@@ -1,17 +1,17 @@
 ﻿@page
-@model VotingSystem.Frontend.Pages.Auth.Register.IndexModel
+@model Votingsystem.frontend.Pages.Auth.Register.IndexModel
 @{
     ViewData["Title"] = "Register";
 }
 
 @*
- REGISTRATION PAGE 
+ REGISTRATION PAGE
   Fields:
   - Full name
   - Date of birth (18+ validation)
   - Email
   - Password + Confirm
-  - request creator/admin access 
+  - request creator/admin access
 
   After register:
   - pb_isLoggedIn = true
@@ -22,77 +22,18 @@
 *@
 
 <section class="min-h-[70vh] flex items-center justify-center">
-    <div class="w-full max-w-xl space-y-6">
 
         <div class="text-center space-y-2">
             <h1 class="text-3xl font-semibold">Create your account</h1>
-            <p class="text-slate-400">Register to join elections and polls.</p>
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-4">
 
-            <label class="block">
-                <span class="text-sm text-slate-300">Full name</span>
-                <input id="regName"
-                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                       placeholder="e.g. Mohammad Saberi" />
-            </label>
 
-            <label class="block">
-                <span class="text-sm text-slate-300">Date of birth</span>
-                <input id="regDob" type="date"
-                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                <span class="text-xs text-slate-500">You must be 18+ to participate.</span>
-            </label>
 
-            <label class="block">
-                <span class="text-sm text-slate-300">Email</span>
-                <input id="regEmail" type="email"
-                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                       placeholder="name@example.com" />
-            </label>
 
-            <label class="block">
-                <span class="text-sm text-slate-300">Password</span>
-                <input id="regPass" type="password"
-                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                       placeholder="••••••••" />
-                <span class="text-xs text-slate-500">Minimum 8 characters (prototype rule).</span>
-            </label>
-
-            <label class="block">
-                <span class="text-sm text-slate-300">Confirm password</span>
-                <input id="regPass2" type="password"
-                       class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                       placeholder="••••••••" />
-            </label>
-
-            <label class="flex items-start gap-3 pt-1">
-                <input id="reqCreator" type="checkbox" class="mt-1 accent-indigo-500" />
-                <span class="text-sm text-slate-300">
-                    I want to become a creator/admin (requires approval)
-                    <span class="block text-xs text-slate-500 mt-1">
-                        You won’t get admin access automatically. Owner approval only.
-                    </span>
                 </span>
-            </label>
 
-            <p id="regError" class="hidden text-sm text-rose-300"></p>
 
-            <div class="pt-2 space-y-3">
-                <button id="regBtn" type="button"
-                        class="w-full px-4 py-3 rounded-xl font-medium bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950
-                               shadow-[0_0_25px_rgba(99,102,241,0.35)] text-center block">
-                    Create account
-                </button>
-
-                <a asp-page="/Auth/Login"
-                   class="block text-center text-sm text-slate-400 hover:text-slate-200">
                     Already have an account? Login
                 </a>
             </div>

@@ -1,12 +1,11 @@
 ﻿@page
-@model VotingSystem.Frontend.Pages.Auth.LoginModel
+@model Votingsystem.frontend.Pages.Auth.LoginModel
 @{
     ViewData["Title"] = "Sign in";
 }
 
 @*
-  LOGIN 
-  
+  LOGIN
 *@
 
 <section class="max-w-xl mx-auto space-y-6">
@@ -19,44 +18,24 @@
 
         <label class="block">
             <span class="text-sm text-slate-300">Email</span>
-            <input id="loginEmail"
-                   class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                    placeholder="name@example.com" />
         </label>
 
         <label class="block">
             <span class="text-sm text-slate-300">Password</span>
-            <input id="loginPass" type="password"
                    class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                    placeholder="••••••••" />
         </label>
 
+        @* TEMP buttons just to test the routing flow *@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-
-            <!-- Login as User -->
-            <button id="loginUserBtn"
-                    type="button"
-                    class="px-4 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium">
-                Login as User
-            </button>
-
-            <!-- Login as Admin -->
-            <button id="loginAdminBtn"
-                    type="button"
-                    class="px-4 py-3 rounded-xl border border-[#D4AF37]/60 text-indigo-300 hover:bg-[#D4AF37]/10 font-medium">
-                Login as Admin
-            </button>
-
-        </div>
-
-        <p id="loginError" class="hidden text-sm text-rose-300"></p>
-
-        <div class="pt-2 text-center">
-            <a asp-page="/Auth/Register/Index"
-               class="text-sm text-indigo-300 hover:text-[#D4AF37]">
-                Don’t have an account? Register
+            <a asp-page="/Admin/Dashboard"
+               class="px-4 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium text-center">
+                Sign in as Admin
             </a>
+
         </div>
+
     </div>
 </section>
 

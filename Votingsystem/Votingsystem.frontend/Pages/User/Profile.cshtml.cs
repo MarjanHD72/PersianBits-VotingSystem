@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace VotingSystem.Frontend.Pages.User;
+namespace Votingsystem.frontend.Pages.User;
 
 public class ProfileModel : PageModel
 {
