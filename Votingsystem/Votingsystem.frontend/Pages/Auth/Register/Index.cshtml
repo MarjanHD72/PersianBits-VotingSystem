@@ -1,10 +1,24 @@
 ﻿@page
-@model VotingSystem.Frontend.Pages.Auth.Register.IndexModel
+@model Votingsystem.frontend.Pages.Auth.Register.IndexModel
 @{
     ViewData["Title"] = "Register";
 }
 
 @*
+ REGISTRATION PAGE
+  Fields:
+  - Full name
+  - Date of birth (18+ validation)
+  - Email
+  - Password + Confirm
+  - request creator/admin access
+
+  After register:
+  - pb_isLoggedIn = true
+  - pb_isApprovedCreator = false
+  - pb_requestedCreator = true/false
+  - If pb_pendingSession exists -> go to Poll/Take?session=...
+  - Else -> User Dashboard
 *@
 
 <section class="min-h-[70vh] flex items-center justify-center">
@@ -71,12 +85,12 @@
             if (!p1 || p1.length < 8) { err.textContent = "Password must be at least 8 characters."; err.classList.remove("hidden"); return; }
             if (p1 !== p2) { err.textContent = "Passwords do not match."; err.classList.remove("hidden"); return; }
 
-            // Frontend-only auth state
+            //  auth state
             localStorage.setItem("pb_isLoggedIn", "true");
-            localStorage.setItem("pb_isApprovedCreator", "false"); // approval is manual later
+            localStorage.setItem("pb_isApprovedCreator", "false"); // approval is manual 
             localStorage.setItem("pb_requestedCreator", wantsCreator ? "true" : "false");
 
-            // Store profile basics (frontend-only placeholders)
+            // Store profile basics 
             localStorage.setItem("pb_userName", name);
             localStorage.setItem("pb_userDob", dobRaw);
             localStorage.setItem("pb_userEmail", email);

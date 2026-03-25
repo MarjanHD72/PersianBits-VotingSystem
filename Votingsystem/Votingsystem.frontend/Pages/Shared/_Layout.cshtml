@@ -1,26 +1,14 @@
-﻿@*
-    _Layout.cshtml
-    -------------
-    This is the shared layout for the entire Razor Pages site.
-
-    - Header + footer live here (shown on every page).
-    - Each page injects its content into @RenderBody().
-    - Tailwind is included via CDN for a modern UI without extra setup.
-*@
-
 @{
-    // Page title shown in the browser tab.
-    // Individual pages can override this by setting ViewData["Title"].
     var title = ViewData["Title"] as string ?? "PersianBits Voting System";
 }
 
 <!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@title</title>
 
-    @* Tailwind CSS (CDN). Easy for prototyping. *@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -383,21 +371,40 @@
     </style>
 </head>
 
+<body class="min-h-screen">
+    <div class="pb-bg-wrap">
+        <div class="pb-bg-image"></div>
+    </div>
+
     <div class="min-h-screen flex flex-col">
 
+        <header class="sticky top-0 z-40 backdrop-blur" style="background: var(--pb-elevated); border-bottom: 1px solid var(--pb-border);">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
+                <a asp-page="/Index" class="flex items-center gap-3 font-semibold tracking-tight" style="color: var(--pb-text); text-decoration: none;">
+                    <span class="pb-logo">
+                        <img src="~/assets/logo.jpg" alt="PersianBits logo" />
                     </span>
                     <span>PersianBits Voting System</span>
                 </a>
 
-                @*
-                    Minimal navigation (your requirement):
-                    - No "Admin" or "User" buttons here.
-                    - Everyone goes through Login.
-                    - Later backend decides where to send them after successful login.
-                *@
                 <nav class="flex items-center gap-2">
+                    <button class="pb-theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <div class="knob" id="themeKnob"></div>
+                    </button>
+
+                    <a id="navLogin" asp-page="/Auth/Login" class="pb-btn pb-btn-gold text-sm">Login</a>
+                    <a id="navDashboard" href="#" style="display:none;" class="pb-btn pb-btn-outline text-sm">Dashboard</a>
+
+                    <!-- Avatar (profile link) -->
+                    <a id="navAvatarLink" href="#" style="display:none; text-decoration:none;">
+                        <div id="navAvatar" style="
+                            width: 36px; height: 36px; border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1.2rem; cursor: pointer;
+                            background: var(--pb-avatarBg); border: 1.5px solid var(--pb-avatarBdr);
+                            transition: all 0.2s ease;
+                        "></div>
                     </a>
 
                     <button id="navLogout" type="button" style="display:none;" class="pb-btn pb-btn-outline text-sm">Logout</button>
@@ -406,15 +413,98 @@
             </div>
         </header>
 
-        @* MAIN CONTENT (each page renders here) *@
         <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
             @RenderBody()
         </main>
 
+        <footer style="border-top: 1px solid var(--pb-border2);">
+            <div class="max-w-6xl mx-auto px-4 py-6 text-xs flex items-center justify-between" style="color: var(--pb-muted2);">
+                <span>PersianBits Voting System</span>
+                <span>&copy; @DateTime.Now.Year PersianBits</span>
             </div>
         </footer>
 
     </div>
 
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (() => {
+          // ===== THEME =====
+          const html = document.documentElement;
+          const toggle = document.getElementById('themeToggle');
+          const knob = document.getElementById('themeKnob');
+          function getTheme() { return localStorage.getItem('pb-theme') || 'dark'; }
+          function applyTheme(t) {
+            html.setAttribute('data-theme', t);
+            localStorage.setItem('pb-theme', t);
+            knob.textContent = t === 'dark' ? '🌙' : '☀️';
+          }
+          applyTheme(getTheme());
+          toggle.addEventListener('click', () => applyTheme(getTheme() === 'dark' ? 'light' : 'dark'));
+
+          // ===== AUTH NAV + AVATAR =====
+          const avatarEmojis = [
+            '😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼',
+            '🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸',
+            '🌻','⭐','🔥','💎','🎯','🎮','🎨','🎵','🚀','🏆',
+            '🎭','🎪','🧊','🌈','🍀','🎲','👻','🤖','👽','🧙'
+          ];
+
+          function getAvatar() {
+            let av = localStorage.getItem('pb_avatar');
+            if (!av) {
+              av = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+              localStorage.setItem('pb_avatar', av);
+            }
+            return av;
+          }
+
+          const isLoggedIn = localStorage.getItem("pb_isLoggedIn") === "true";
+          const isCreator = localStorage.getItem("pb_isApprovedCreator") === "true";
+          const login = document.getElementById("navLogin");
+          const dash = document.getElementById("navDashboard");
+          const logout = document.getElementById("navLogout");
+          const avatarLink = document.getElementById("navAvatarLink");
+          const avatarEl = document.getElementById("navAvatar");
+
+          function showEl(el) { if (el) el.style.display = 'inline-flex'; }
+          function hideEl(el) { if (el) el.style.display = 'none'; }
+
+          if (isLoggedIn) {
+            hideEl(login);
+            showEl(dash);
+            showEl(logout);
+            showEl(avatarLink);
+
+            dash.href = isCreator ? "/Admin/Dashboard" : "/User/Dashboard";
+            avatarLink.href = isCreator ? "/Admin/Profile" : "/User/Profile";
+            avatarEl.textContent = getAvatar();
+
+            // Hover glow on avatar
+            avatarLink.addEventListener('mouseenter', () => {
+              avatarEl.style.borderColor = 'var(--pb-gold)';
+              avatarEl.style.boxShadow = '0 0 12px rgba(212,175,55,0.35)';
+            });
+            avatarLink.addEventListener('mouseleave', () => {
+              avatarEl.style.borderColor = 'var(--pb-avatarBdr)';
+              avatarEl.style.boxShadow = 'none';
+            });
+
+            logout.onclick = () => {
+              localStorage.removeItem("pb_isLoggedIn");
+              localStorage.removeItem("pb_isApprovedCreator");
+              localStorage.removeItem("pb_userEmail");
+              localStorage.removeItem("pb_requestedCreator");
+              window.location.href = "/Index";
+            };
+          } else {
+            showEl(login);
+            hideEl(dash);
+            hideEl(logout);
+            hideEl(avatarLink);
+          }
+        })();
+    </script>
 </body>
 </html>
