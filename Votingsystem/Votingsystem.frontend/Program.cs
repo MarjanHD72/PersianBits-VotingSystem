@@ -58,5 +58,65 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages();
+// ─── AI Chat Endpoint ───────────────────────────────────────────────
+app.MapPost("/api/ai/chat", async (HttpContext context) =>
+{
+    var request = await context.Request.ReadFromJsonAsync<ChatRequest>();
+    var history = request?.History;
 
+    if (history == null || history.Count == 0)
+        return Results.BadRequest("No messages");
+
+// Build conversation string
+    var conversation = string.Join("\n", history.Select(m =>
+        m.Role == "user" ? $"User: {m.Content}" : $"Assistant: {m.Content}"));
+
+    var lastUserMessage = history.LastOrDefault(m => m.Role == "user")?.Content ?? "";
+
+    var prompt = $@"You are an AI assistant for PersianBits Voting System. 
+Keep answers SHORT (max 2 sentences). 
+ONLY answer about the PersianBits Voting System.
+
+Conversation so far:
+{conversation}
+
+Latest question: {lastUserMessage}
+Answer:";
+
+    using var http = new HttpClient();
+    http.Timeout = TimeSpan.FromSeconds(60);
+
+    try
+    {
+        var ollamaResponse = await http.PostAsJsonAsync("http://localhost:11434/api/generate", new
+        {
+            model = "phi3",
+            prompt = prompt,
+            stream = false
+        });
+
+        if (!ollamaResponse.IsSuccessStatusCode)
+            return Results.Problem("Ollama server error: " + ollamaResponse.StatusCode);
+
+        var raw = await ollamaResponse.Content.ReadAsStringAsync();
+        var json = System.Text.Json.JsonDocument.Parse(raw);
+        var reply = json.RootElement.GetProperty("response").GetString();
+
+        return Results.Ok(new { reply });
+    }
+    catch (HttpRequestException ex)
+    {
+        return Results.Problem("Cannot connect to Ollama. Make sure it's running on port 11434. Error: " + ex.Message);
+    }
+});
 app.Run();
+public class ChatRequest
+{
+    public List<Message> History { get; set; } = new();
+}
+
+public class Message
+{
+    public string Role { get; set; } = "";
+    public string Content { get; set; } = "";
+}
