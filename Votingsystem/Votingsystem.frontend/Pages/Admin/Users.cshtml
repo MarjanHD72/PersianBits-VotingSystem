@@ -1,20 +1,16 @@
 ﻿@page
-@model VotingSystem.Frontend.Pages.Admin.UsersModel
+@model Votingsystem.frontend.Pages.Admin.UsersModel
 @{
     ViewData["Title"] = "Users";
 }
 
 @*
-    USERS (Admin) - Frontend Only
-    -----------------------------
+    USERS (Admin) 
     Purpose:
-    - Admin can view users and basic info.
-    - Later backend will:
-        - Load users from DB
-        - Support searching/filtering
-        - Allow enable/disable users
+    - Admin can view users and basic info
+        - Load users from Database
+        - Support searching/filterin
         - View full user profile and activity
-        - Show creator verification status
 *@
 
 <section class="max-w-6xl mx-auto space-y-6">
@@ -32,20 +28,11 @@
         </a>
     </div>
 
-    <!-- Search + filters (UI only) -->
-    <div class="grid md:grid-cols-3 gap-3">
-        <input class="md:col-span-2 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
+    <!-- Search -->
+    <div>
+        <input class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
                    focus:outline-none focus:ring-2 focus:ring-indigo-500"
                placeholder="Search by name, username, email..." />
-
-        <select class="px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option>All users</option>
-            <option>Creators</option>
-            <option>Normal users</option>
-            <option>Pending verification</option>
-            <option>Disabled</option>
-        </select>
     </div>
 
     <!-- Users list -->
@@ -72,9 +59,6 @@
                 <div class="flex flex-wrap items-center gap-2">
                     <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
                         Active
-                    </span>
-                    <span class="text-xs px-2 py-1 rounded-full bg-[#D4AF37]/15 text-indigo-300 border border-[#D4AF37]/25">
-                        Creator
                     </span>
 
                     <a asp-page="/Admin/UserDetails"
@@ -119,11 +103,11 @@
                 </div>
             </div>
 
-            <!-- User row (pending verification) -->
+            <!-- User row -->
             <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-amber-500/15 border border-amber-500/25 flex items-center justify-center">
-                        <span class="text-amber-300 font-semibold">A</span>
+                    <div class="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center">
+                        <span class="text-slate-200 font-semibold">A</span>
                     </div>
                     <div>
                         <p class="font-medium">Ali Rezaei <span class="text-slate-400 text-sm">@@ali_r</span></p>
@@ -132,11 +116,8 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25">
-                        Pending verification
-                    </span>
-                    <span class="text-xs px-2 py-1 rounded-full bg-[#D4AF37]/15 text-indigo-300 border border-[#D4AF37]/25">
-                        Creator request
+                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
+                        Active
                     </span>
 
                     <a asp-page="/Admin/UserDetails"
@@ -144,8 +125,8 @@
                         View
                     </a>
                     <button type="button"
-                            class="px-3 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium text-sm">
-                        Approve
+                            class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
+                        Disable
                     </button>
                 </div>
             </div>
