@@ -1,61 +1,73 @@
-﻿@page
-@model Votingsystem.frontend.Pages.Poll.TakeModel
-@{
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using VotingSystem.Domain;
+
+namespace Votingsystem.frontend.Pages.Poll;
+
+[Authorize]
+public class TakeModel : PageModel
+{
+private readonly AppDbContext _db;
+public TakeModel(AppDbContext db) => _db = db;
+
+public Election? Election { get; set; }
+public bool AlreadyVoted { get; set; }
+public string? Error { get; set; }
+
+public async Task<IActionResult>
+OnGetAsync(string? session)
+{
+if (string.IsNullOrWhiteSpace(session)) return RedirectToPage("/User/Dashboard");
+
+Election = await _db.Elections
+.Include(e => e.Candidates)
+.Include(e => e.Options)
+.FirstOrDefaultAsync(e => e.SessionId == session.Trim().ToUpper());
+
+if (Election == null) { Error = "Election not found."; return Page(); }
+if (Election.Status != "running") { Error = "This election is not currently active."; return Page(); }
+
+var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+AlreadyVoted = await _db.Votes.AnyAsync(v => v.ElectionId == Election.Id && v.UserId == userId);
+
+return Page();
 }
 
-@*
-*@
+public async Task<IActionResult>
+OnPostAsync(string session, int? candidateId, int? ratingValue,
+string? textResponse, List<int>
+? selectedOptions, string? rankingOrder)
+{
+var election = await _db.Elections
+.Include(e => e.Candidates)
+.Include(e => e.Options)
+.FirstOrDefaultAsync(e => e.SessionId == session.Trim().ToUpper());
 
+if (election == null || election.Status != "running")
+return RedirectToPage("/User/Dashboard");
 
-    <div class="space-y-2">
-    </div>
+var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        </div>
-        </div>
+if (await _db.Votes.AnyAsync(v => v.ElectionId == election.Id && v.UserId == userId))
+return RedirectToPage("/Poll/Thanks");
 
-        <div class="candidate-card cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/40 p-4 hover:bg-slate-900/70 transition"
-             data-name="Mina Farhadi"
-             data-desc="Mina prioritizes student wellbeing, mental health resources, and campus community events."
-             data-img="https://images.unsplash.com/photo-1580489944761-15a19d654956">
-            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956"
-                 class="w-full h-48 object-cover rounded-xl mb-3" />
-            <h3 class="font-semibold">Mina Farhadi</h3>
-            <p class="text-sm text-slate-400 mt-1">Wellbeing & campus life</p>
-        </div>
+var vote = new Vote
+{
+ElectionId = election.Id,
+UserId = userId,
+CandidateId = candidateId,
+RatingValue = ratingValue,
+TextResponse = textResponse,
+SelectedOptions = selectedOptions != null ? string.Join(",", selectedOptions) : null,
+RankingOrder = rankingOrder
+};
 
-    <!-- Question 1: Single choice -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Single choice</p>
-            <h2 class="text-lg font-semibold mt-1">How satisfied are you with this module?</h2>
-    </div>
+_db.Votes.Add(vote);
+await _db.SaveChangesAsync();
 
-
-
-    </div>
-    </div>
-
-
-
-
-
-        </div>
-    </div>
-
-    <!-- Question 3: Open text -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Open text</p>
-            <h2 class="text-lg font-semibold mt-1">What should we improve?</h2>
-</div>
-
-
-
-
-
-
-
-
-
-
-
+return RedirectToPage("/Poll/Thanks");
+}
+}
