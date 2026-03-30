@@ -1,73 +1,194 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using VotingSystem.Domain;
-
-namespace Votingsystem.frontend.Pages.Poll;
-
-[Authorize]
-public class TakeModel : PageModel
-{
-private readonly AppDbContext _db;
-public TakeModel(AppDbContext db) => _db = db;
-
-public Election? Election { get; set; }
-public bool AlreadyVoted { get; set; }
-public string? Error { get; set; }
-
-public async Task<IActionResult>
-OnGetAsync(string? session)
-{
-if (string.IsNullOrWhiteSpace(session)) return RedirectToPage("/User/Dashboard");
-
-Election = await _db.Elections
-.Include(e => e.Candidates)
-.Include(e => e.Options)
-.FirstOrDefaultAsync(e => e.SessionId == session.Trim().ToUpper());
-
-if (Election == null) { Error = "Election not found."; return Page(); }
-if (Election.Status != "running") { Error = "This election is not currently active."; return Page(); }
-
-var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-AlreadyVoted = await _db.Votes.AnyAsync(v => v.ElectionId == Election.Id && v.UserId == userId);
-
-return Page();
+﻿@page
+@model Votingsystem.frontend.Pages.Poll.TakeModel
+@{
+    ViewData["Title"] = "Election";
+    var session = HttpContext.Request.Query["session"].ToString();
 }
 
-public async Task<IActionResult>
-OnPostAsync(string session, int? candidateId, int? ratingValue,
-string? textResponse, List<int>
-? selectedOptions, string? rankingOrder)
-{
-var election = await _db.Elections
-.Include(e => e.Candidates)
-.Include(e => e.Options)
-.FirstOrDefaultAsync(e => e.SessionId == session.Trim().ToUpper());
+<section class="max-w-4xl mx-auto space-y-8 px-4">
 
-if (election == null || election.Status != "running")
-return RedirectToPage("/User/Dashboard");
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="pb-card p-6 text-center">
+            <p style="color: var(--pb-danger); font-size: 1.1rem;">@Model.Error</p>
+            <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline mt-4">Back to Dashboard</a>
+        </div>
+    }
+    else if (Model.AlreadyVoted)
+    {
+        <div class="pb-card p-6 text-center space-y-4">
+            <h2 class="text-xl font-semibold" style="color: var(--pb-text);">Already Voted</h2>
+            <p style="color: var(--pb-muted);">You have already submitted your vote for this election.</p>
+            <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline">Back to Dashboard</a>
+        </div>
+    }
+    else if (Model.Election != null)
+    {
+        <div class="space-y-2">
+            <p class="text-sm" style="color: var(--pb-muted);">PersianBits · @Model.Election.Type.ToUpper()</p>
+            <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">@Model.Election.Title</h1>
+            @if (!string.IsNullOrEmpty(Model.Election.Description))
+            {
+                <p style="color: var(--pb-muted);">@Model.Election.Description</p>
+            }
+        </div>
 
-var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        <form method="post" id="voteForm">
+            <input type="hidden" name="session" value="@session" />
 
-if (await _db.Votes.AnyAsync(v => v.ElectionId == election.Id && v.UserId == userId))
-return RedirectToPage("/Poll/Thanks");
+            @if (Model.Election.Type == "election")
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach (var c in Model.Election.Candidates)
+                    {
+                        <label class="cursor-pointer">
+                            <input type="radio" name="candidateId" value="@c.Id" class="hidden peer" required />
+                            <div class="pb-card p-4 hover:shadow-lg transition">
+                                @if (!string.IsNullOrEmpty(c.ImageUrl))
+                                {
+                                    <img src="@c.ImageUrl" class="w-full h-48 object-cover rounded-xl mb-3" onerror="this.style.display='none'" />
+                                }
+                                <h3 class="font-semibold" style="color: var(--pb-text);">@c.Name</h3>
+                                @if (!string.IsNullOrEmpty(c.Description))
+                                {
+                                    <p class="text-sm mt-1" style="color: var(--pb-muted);">@c.Description</p>
+                                }
+                            </div>
+                        </label>
+                    }
+                </div>
+            }
+            else if (Model.Election.Type == "rating")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p class="font-medium" style="color: var(--pb-text);">Rate this:</p>
+                    <div class="flex gap-3 justify-center flex-wrap">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <label class="cursor-pointer">
+                                <input type="radio" name="ratingValue" value="@i" class="hidden peer" required />
+                                <div class="w-14 h-14 rounded-xl flex items-center justify-center text-2xl transition"
+                                     style="background: var(--pb-glass2); border: 1px solid var(--pb-border);">@i</div>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.Election.Type == "text")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p class="font-medium" style="color: var(--pb-text);">Your response:</p>
+                    <textarea name="textResponse" rows="5" class="w-full px-4 py-3 rounded-xl" placeholder="Write your response..." required></textarea>
+                </div>
+            }
+            else if (Model.Election.Type == "multichoice")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p class="font-medium" style="color: var(--pb-text);">Select one or more options:</p>
+                    <div class="space-y-3">
+                        @foreach (var opt in Model.Election.Options)
+                        {
+                            <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl transition"
+                                   style="background: var(--pb-glass2); border: 1px solid var(--pb-border);">
+                                <input type="checkbox" name="selectedOptions" value="@opt.Id"
+                                       style="width:20px; height:20px; accent-color: var(--pb-gold);" />
+                                <span style="color: var(--pb-text);">@opt.Text</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.Election.Type == "ranking")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p class="font-medium" style="color: var(--pb-text);">Drag to rank (top = best):</p>
+                    <input type="hidden" name="rankingOrder" id="rankingOrder" />
+                    <div id="rankList" class="space-y-2">
+                        @foreach (var opt in Model.Election.Options)
+                        {
+                            <div class="rank-item flex items-center gap-3 p-4 rounded-xl cursor-grab active:cursor-grabbing"
+                                 data-id="@opt.Id"
+                                 style="background: var(--pb-glass2); border: 1px solid var(--pb-border); user-select:none;"
+                                 draggable="true">
+                                <span style="color: var(--pb-gold); font-weight:700; min-width:24px;" class="rank-num"></span>
+                                <span style="color: var(--pb-text); flex:1;">@opt.Text</span>
+                                <span style="color: var(--pb-muted2);">☰</span>
+                            </div>
+                        }
+                    </div>
+                    <p class="text-xs" style="color: var(--pb-muted2);">On mobile, use the up/down buttons to reorder.</p>
+                    <div id="rankButtons" class="flex gap-2 sm:hidden">
+                        <button type="button" id="moveUp" class="pb-btn pb-btn-outline text-sm flex-1">▲ Move Up</button>
+                        <button type="button" id="moveDown" class="pb-btn pb-btn-outline text-sm flex-1">▼ Move Down</button>
+                    </div>
+                </div>
+            }
 
-var vote = new Vote
-{
-ElectionId = election.Id,
-UserId = userId,
-CandidateId = candidateId,
-RatingValue = ratingValue,
-TextResponse = textResponse,
-SelectedOptions = selectedOptions != null ? string.Join(",", selectedOptions) : null,
-RankingOrder = rankingOrder
-};
+            <div class="flex justify-end gap-3 mt-6">
+                <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline">Back</a>
+                <button type="submit" class="pb-btn pb-btn-gold">Submit Vote</button>
+            </div>
+        </form>
+    }
+</section>
 
-_db.Votes.Add(vote);
-await _db.SaveChangesAsync();
+@section Scripts {
+<style>
+    input[type="radio"]:checked + div { border-color: var(--pb-gold) !important; box-shadow: 0 0 16px rgba(212,175,55,0.30); }
+    .rank-item.dragging { opacity: 0.5; }
+    .rank-item.selected { border-color: var(--pb-gold) !important; box-shadow: 0 0 8px rgba(212,175,55,0.25); }
+</style>
+<script>
+(() => {
+    const rankList = document.getElementById('rankList');
+    if (!rankList) return;
 
-return RedirectToPage("/Poll/Thanks");
-}
+    let dragItem = null;
+    let selectedItem = null;
+
+    function updateOrder() {
+        const items = rankList.querySelectorAll('.rank-item');
+        items.forEach((el, i) => el.querySelector('.rank-num').textContent = (i + 1) + '.');
+        document.getElementById('rankingOrder').value = Array.from(items).map(el => el.dataset.id).join(',');
+    }
+
+    // Desktop drag & drop
+    rankList.querySelectorAll('.rank-item').forEach(item => {
+        item.addEventListener('dragstart', () => { dragItem = item; item.classList.add('dragging'); });
+        item.addEventListener('dragend', () => { item.classList.remove('dragging'); updateOrder(); });
+        item.addEventListener('dragover', e => e.preventDefault());
+        item.addEventListener('drop', e => {
+            e.preventDefault();
+            if (dragItem && dragItem !== item) {
+                const items = [...rankList.children];
+                if (items.indexOf(dragItem) < items.indexOf(item)) item.after(dragItem);
+                else item.before(dragItem);
+            }
+        });
+
+        // Mobile: tap to select
+        item.addEventListener('click', () => {
+            rankList.querySelectorAll('.rank-item').forEach(el => el.classList.remove('selected'));
+            item.classList.add('selected');
+            selectedItem = item;
+        });
+    });
+
+    // Mobile: move buttons
+    document.getElementById('moveUp')?.addEventListener('click', () => {
+        if (selectedItem && selectedItem.previousElementSibling) {
+            selectedItem.previousElementSibling.before(selectedItem);
+            updateOrder();
+        }
+    });
+    document.getElementById('moveDown')?.addEventListener('click', () => {
+        if (selectedItem && selectedItem.nextElementSibling) {
+            selectedItem.nextElementSibling.after(selectedItem);
+            updateOrder();
+        }
+    });
+
+    updateOrder();
+})();
+</script>
 }
