@@ -4,23 +4,10 @@
     ViewData["Title"] = "Thank you";
 }
 
-@*
-    THANK YOU PAGE (Frontend Only)
-    ------------------------------
-    Later backend:
-    - Confirm submission saved
-    - Show receipt / participation ID if needed
-*@
-
 <section class="min-h-[70vh] flex items-center justify-center">
     <div class="max-w-xl text-center space-y-4">
-        <h1 class="text-3xl font-semibold">Thank you!</h1>
-        <p class="text-slate-400">Your answers have been submitted.</p>
-
-        <a asp-page="/User/Dashboard"
-           class="inline-flex px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-medium
-                  shadow-[0_0_25px_rgba(99,102,241,0.35)]">
-            Back to Dashboard
-        </a>
+        <h1 class="text-3xl font-semibold" style="color: var(--pb-text);">Thank you!</h1>
+        <p style="color: var(--pb-muted);">Your vote has been recorded.</p>
+        <a asp-page="/User/Dashboard" class="pb-btn pb-btn-gold">Back to Dashboard</a>
     </div>
 </section>
