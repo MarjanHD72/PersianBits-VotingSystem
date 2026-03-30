@@ -1,6 +1,4 @@
-﻿using static System.Collections.Specialized.BitVector32;
-
-namespace VotingSystem.Domain;
+﻿namespace VotingSystem.Domain;
 
 public class AppUser
 {

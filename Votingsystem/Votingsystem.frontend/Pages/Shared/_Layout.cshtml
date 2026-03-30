@@ -1,26 +1,14 @@
-﻿@*
-    _Layout.cshtml
-    -------------
-    This is the shared layout for the entire Razor Pages site.
-
-    - Header + footer live here (shown on every page).
-    - Each page injects its content into @RenderBody().
-    - Tailwind is included via CDN for a modern UI without extra setup.
-*@
-
 @{
-    // Page title shown in the browser tab.
-    // Individual pages can override this by setting ViewData["Title"].
     var title = ViewData["Title"] as string ?? "PersianBits Voting System";
 }
 
 <!DOCTYPE html>
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@title</title>
 
-    @* Tailwind CSS (CDN). Easy for prototyping. *@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -380,24 +368,77 @@
         .border-slate-500\/30 { border-color: var(--pb-draftBdr) !important; }
         .text-slate-950 { color: #111 !important; }
         footer { border-color: var(--pb-border2) !important; }
+        @* AI Assistant *@
+        .pb-msg {
+            max-width: 82%;
+            padding: 9px 13px;
+            font-size: 13px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            border-radius: 12px;
+        }
+        .pb-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #b8860b, #daa520);
+            color: #1a0f00;
+            border-radius: 12px 12px 2px 12px;
+            border: none;
+        }
+        .pb-msg.assistant {
+            align-self: flex-start;
+            background: rgba(201, 168, 76, 0.12);
+            border: 1px solid rgba(201, 168, 76, 0.25);
+            color: #f5dfa0;
+            border-radius: 12px 12px 12px 2px;
+        }
+        #chat-messages::-webkit-scrollbar { width: 4px; }
+        #chat-messages::-webkit-scrollbar-thumb { background: #c9a84c44; border-radius: 4px; }
+
+        @@keyframes pb-blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+        .pb-dot {
+            display: inline-block; width: 5px; height: 5px;
+            border-radius: 50%; background: #daa520;
+            animation: pb-blink 1.2s infinite;
+        }
+        .pb-dot:nth-child(2) { animation-delay: .2s; }
+        .pb-dot:nth-child(3) { animation-delay: .4s; }
     </style>
 </head>
 
+<body class="min-h-screen">
+    <div class="pb-bg-wrap">
+        <div class="pb-bg-image"></div>
+    </div>
+
     <div class="min-h-screen flex flex-col">
 
+        <header class="sticky top-0 z-40 backdrop-blur" style="background: var(--pb-elevated); border-bottom: 1px solid var(--pb-border);">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
+                <a asp-page="/Index" class="flex items-center gap-3 font-semibold tracking-tight" style="color: var(--pb-text); text-decoration: none;">
+                    <span class="pb-logo">
+                        <img src="~/assets/logo.jpg" alt="PersianBits logo" />
                     </span>
                     <span>PersianBits Voting System</span>
                 </a>
 
-                @*
-                    Minimal navigation (your requirement):
-                    - No "Admin" or "User" buttons here.
-                    - Everyone goes through Login.
-                    - Later backend decides where to send them after successful login.
-                *@
                 <nav class="flex items-center gap-2">
+                    <button class="pb-theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <div class="knob" id="themeKnob"></div>
+                    </button>
+
+                    <a id="navLogin" asp-page="/Auth/Login" class="pb-btn pb-btn-gold text-sm">Login</a>
+                    <a id="navDashboard" href="#" style="display:none;" class="pb-btn pb-btn-outline text-sm">Dashboard</a>
+
+                    <!-- Avatar (profile link) -->
+                    <a id="navAvatarLink" href="#" style="display:none; text-decoration:none;">
+                        <div id="navAvatar" style="
+                            width: 36px; height: 36px; border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1.2rem; cursor: pointer;
+                            background: var(--pb-avatarBg); border: 1.5px solid var(--pb-avatarBdr);
+                            transition: all 0.2s ease;
+                        "></div>
                     </a>
 
                     <button id="navLogout" type="button" style="display:none;" class="pb-btn pb-btn-outline text-sm">Logout</button>
@@ -406,15 +447,254 @@
             </div>
         </header>
 
-        @* MAIN CONTENT (each page renders here) *@
         <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
             @RenderBody()
         </main>
 
+        <footer style="border-top: 1px solid var(--pb-border2);">
+            <div class="max-w-6xl mx-auto px-4 py-6 text-xs flex items-center justify-between" style="color: var(--pb-muted2);">
+                <span>PersianBits Voting System</span>
+                <span>&copy; @DateTime.Now.Year PersianBits</span>
             </div>
         </footer>
 
     </div>
+<!-- Toggle Button -->
+<button id="chat-toggle" onclick="toggleChat()"
+        style="position:fixed;bottom:24px;right:24px;z-index:1000;
+               width:52px;height:52px;border-radius:50%;border:1px solid #c9a84c;
+               background:linear-gradient(135deg,#b8860b,#daa520);
+               color:#1a0f00;font-size:20px;cursor:pointer;
+               box-shadow:0 4px 18px rgba(180,130,0,.35);">
+    &#128172;
+</button>
 
+<!-- Chat Window -->
+<div id="chat-window"
+     style="display:none;position:fixed;bottom:88px;right:24px;z-index:999;
+            width:340px;height:460px;border-radius:16px;overflow:hidden;
+            border:1px solid #c9a84c;
+            background:rgba(20,14,0,0.88);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+            box-shadow:0 8px 32px rgba(180,130,0,.25);
+            flex-direction:column;">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(90deg,#b8860b,#daa520,#b8860b);
+                padding:13px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;
+                        border:1.5px solid rgba(255,255,255,0.4);
+                        background:rgba(0,0,0,0.3);
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:13px;color:#fff;font-weight:600;">P</div>
+            <div>
+                <div style="font-weight:600;font-size:13px;color:#fff;letter-spacing:.4px;">PersianBits AI</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
+                    Online
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+            <button onclick="clearChat()"
+                    style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.2);
+                           color:rgba(255,255,255,0.8);border-radius:6px;
+                           padding:3px 8px;font-size:11px;cursor:pointer;">Clear</button>
+            <button onclick="toggleChat()"
+                    style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.2);
+                           color:rgba(255,255,255,0.8);border-radius:6px;
+                           padding:3px 8px;font-size:13px;cursor:pointer;">&#10005;</button>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="chat-messages"
+         style="flex:1;overflow-y:auto;padding:12px;
+                display:flex;flex-direction:column;gap:8px;
+                scrollbar-width:thin;scrollbar-color:#c9a84c33 transparent;">
+        <div class="pb-msg assistant">
+            Hi! How can I assist you with PersianBits Voting System?
+        </div>
+    </div>
+
+    <!-- Input -->
+    <div style="padding:10px;border-top:1px solid rgba(201,168,76,0.2);
+                display:flex;gap:8px;background:rgba(0,0,0,0.3);">
+        <input id="chat-input" type="text" placeholder="Ask about voting..."
+               onkeydown="if(event.key==='Enter') sendMessage()"
+               style="flex:1;padding:9px 12px;border-radius:10px;
+                      border:1px solid rgba(201,168,76,0.35);
+                      background:rgba(255,255,255,0.06);
+                      color:#f5dfa0;font-size:13px;outline:none;" />
+        <button onclick="sendMessage()"
+                style="padding:9px 14px;
+                       background:linear-gradient(135deg,#b8860b,#daa520);
+                       color:#1a0f00;border:none;border-radius:10px;
+                       cursor:pointer;font-size:15px;font-weight:700;">
+            &#10148;
+        </button>
+    </div>
+</div>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        (() => {
+          // ===== THEME =====
+          const html = document.documentElement;
+          const toggle = document.getElementById('themeToggle');
+          const knob = document.getElementById('themeKnob');
+          function getTheme() { return localStorage.getItem('pb-theme') || 'dark'; }
+          function applyTheme(t) {
+            html.setAttribute('data-theme', t);
+            localStorage.setItem('pb-theme', t);
+            knob.textContent = t === 'dark' ? '🌙' : '☀️';
+          }
+          applyTheme(getTheme());
+          toggle.addEventListener('click', () => applyTheme(getTheme() === 'dark' ? 'light' : 'dark'));
+
+          // ===== AUTH NAV + AVATAR =====
+          const avatarEmojis = [
+            '😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼',
+            '🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸',
+            '🌻','⭐','🔥','💎','🎯','🎮','🎨','🎵','🚀','🏆',
+            '🎭','🎪','🧊','🌈','🍀','🎲','👻','🤖','👽','🧙'
+          ];
+
+          function getAvatar() {
+            let av = localStorage.getItem('pb_avatar');
+            if (!av) {
+              av = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
+              localStorage.setItem('pb_avatar', av);
+            }
+            return av;
+          }
+
+          const isLoggedIn = localStorage.getItem("pb_isLoggedIn") === "true";
+          const isCreator = localStorage.getItem("pb_isApprovedCreator") === "true";
+          const login = document.getElementById("navLogin");
+          const dash = document.getElementById("navDashboard");
+          const logout = document.getElementById("navLogout");
+          const avatarLink = document.getElementById("navAvatarLink");
+          const avatarEl = document.getElementById("navAvatar");
+
+          function showEl(el) { if (el) el.style.display = 'inline-flex'; }
+          function hideEl(el) { if (el) el.style.display = 'none'; }
+
+          if (isLoggedIn) {
+            hideEl(login);
+            showEl(dash);
+            showEl(logout);
+            showEl(avatarLink);
+
+            dash.href = isCreator ? "/Admin/Dashboard" : "/User/Dashboard";
+            avatarLink.href = isCreator ? "/Admin/Profile" : "/User/Profile";
+            avatarEl.textContent = getAvatar();
+
+            // Hover glow on avatar
+            avatarLink.addEventListener('mouseenter', () => {
+              avatarEl.style.borderColor = 'var(--pb-gold)';
+              avatarEl.style.boxShadow = '0 0 12px rgba(212,175,55,0.35)';
+            });
+            avatarLink.addEventListener('mouseleave', () => {
+              avatarEl.style.borderColor = 'var(--pb-avatarBdr)';
+              avatarEl.style.boxShadow = 'none';
+            });
+
+            logout.onclick = () => {
+              localStorage.removeItem("pb_isLoggedIn");
+              localStorage.removeItem("pb_isApprovedCreator");
+              localStorage.removeItem("pb_userEmail");
+              localStorage.removeItem("pb_requestedCreator");
+              window.location.href = "/Index";
+            };
+          } else {
+            showEl(login);
+            hideEl(dash);
+            hideEl(logout);
+            hideEl(avatarLink);
+          }
+        })();
+    
+    let chatHistory = [];
+    let chatOpen = false;
+
+    function toggleChat() {
+        const win = document.getElementById("chat-window");
+        chatOpen = !chatOpen;
+        win.style.display = chatOpen ? "flex" : "none";
+        if (chatOpen) document.getElementById("chat-input").focus();
+    }
+
+    function addMessage(role, text, isTyping = false) {
+        const box = document.getElementById("chat-messages");
+        const div = document.createElement("div");
+        div.className = "pb-msg " + role;
+        if (isTyping) {
+            div.innerHTML = '<span class="pb-dot"></span><span class="pb-dot"></span><span class="pb-dot"></span>';
+        } else {
+            div.textContent = text;
+        }
+        const id = "pbm-" + Date.now() + Math.random().toString(36).slice(2);
+        div.id = id;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+        return id;
+    }
+
+    function removeMessage(id) {
+        document.getElementById(id)?.remove();
+    }
+
+    async function typeText(id, text) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = "";
+        for (const ch of text) {
+            el.textContent += ch;
+            await new Promise(r => setTimeout(r, 16));
+            document.getElementById("chat-messages").scrollTop = 9999;
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById("chat-input");
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage("user", text);
+        chatHistory.push({ role: "user", content: text });
+        input.value = "";
+
+        const loadingId = addMessage("assistant", "", true);
+
+        try {
+            const res = await fetch("/api/ai/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ history: chatHistory })
+            });
+            if (!res.ok) throw new Error("Server error: " + res.status);
+            const data = await res.json();
+            removeMessage(loadingId);
+            const replyId = addMessage("assistant", "");
+            chatHistory.push({ role: "assistant", content: data.reply });
+            await typeText(replyId, data.reply);
+        } catch (err) {
+            removeMessage(loadingId);
+            addMessage("assistant", "Connection error. Please try again.");
+            console.error(err);
+        }
+    }
+
+    function clearChat() {
+        chatHistory = [];
+        const box = document.getElementById("chat-messages");
+        box.innerHTML = "";
+        addMessage("assistant", "Hi! How can I assist you with Electra Smart Voting System?");
+    }
+
+    </script>
 </body>
 </html>
