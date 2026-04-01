@@ -35,9 +35,11 @@ public class TakeModel : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string session, int? candidateId, int? ratingValue,
+    public async Task<IActionResult> OnPostAsync(string? session, int? candidateId, int? ratingValue,
         string? textResponse, List<int>? selectedOptions, string? rankingOrder)
     {
+        if (string.IsNullOrWhiteSpace(session)) return RedirectToPage("/User/Dashboard");
+
         var election = await _db.Elections
             .Include(e => e.Candidates)
             .Include(e => e.Options)

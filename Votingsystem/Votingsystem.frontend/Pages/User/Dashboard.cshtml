@@ -1,128 +1,152 @@
 ﻿@page
 @model Votingsystem.frontend.Pages.User.DashboardModel
 @{
-    ViewData["Title"] = "User Dashboard";
+    ViewData["Title"] = "Dashboard";
+    var avatar = User.FindFirst("Avatar")?.Value ?? "😀";
+    var name   = User.Identity?.Name ?? "Voter";
 }
-
-
-
-    .pb-card-strong {
-        box-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-
-    .pb-row {
-        background: var(--pb-glass2);
-        border: 1px solid rgba(212,175,55,0.16);
-        border-radius: 1rem; /* 16px */
-    }
-
-    .pb-btn {
-        padding: .75rem 1.25rem;
-        border-radius: 14px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .5rem;
-        transition: all .2s ease;
-        min-width: 110px;
-    }
-
-    /* Primary = your gold gradient */
-    .pb-btn-primary {
-        background: linear-gradient(135deg, var(--pb-gold), var(--pb-goldGlow));
-        color: #111;
-        box-shadow: 0 0 18px rgba(212,175,55,0.25);
-    }
-
-        .pb-btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 0 30px rgba(255,201,74,0.45);
-        }
-
-    /* Ghost = subtle glass outline */
-    .pb-btn-ghost {
-        background: rgba(0,0,0,0.20);
-        border: 1px solid rgba(212,175,55,0.28);
-        color: var(--pb-text);
-    }
-
-        .pb-btn-ghost:hover {
-            background: rgba(212,175,55,0.08);
-        }
-
-    /* Chip on the join card (small gold accent, not “casino”) */
-    .pb-chip {
-        padding: .55rem 1rem;
-        border-radius: 14px;
-        font-weight: 700;
-        background: rgba(212,175,55,0.16);
-        border: 1px solid rgba(212,175,55,0.35);
-        color: var(--pb-text);
-        box-shadow: 0 0 18px rgba(255,201,74,0.10);
-        transition: all .2s ease;
-    }
-
-    a:hover .pb-chip {
-        background: rgba(212,175,55,0.22);
-        box-shadow: 0 0 26px rgba(255,201,74,0.18);
-    }
-</style>
 
 <section class="space-y-8">
 
-    <!-- Header -->
-    <div class="space-y-2">
+    <!-- ── Welcome banner ────────────────────────────────────────────────── -->
+    <div class="pb-card p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div style="display:flex;align-items:center;gap:16px;">
+                <div style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+                            font-size:1.8rem;background:var(--pb-avatarBg);border:2px solid var(--pb-gold);
+                            box-shadow:var(--pb-shadowGlow);flex-shrink:0;">@avatar</div>
+                <div>
+                    <p style="font-size:0.75rem;color:var(--pb-muted2);letter-spacing:0.06em;text-transform:uppercase;font-weight:600;">Welcome back</p>
+                    <h1 class="text-xl font-bold" style="color:var(--pb-text);margin-top:2px;">@name</h1>
+                    <p style="font-size:0.8rem;color:var(--pb-muted);margin-top:2px;">
+                        Voter &middot;
+                        <span style="color:var(--pb-gold);font-weight:600;">@Model.VotesCount vote@(Model.VotesCount == 1 ? "" : "s") cast</span>
+                    </p>
+                </div>
+            </div>
+            <a asp-page="/User/Profile" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20v-1a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v1"/></svg>
+                My Profile
+            </a>
+        </div>
     </div>
 
-    <!-- Main action: Join -->
-        <div class="flex items-start justify-between gap-4">
+    <!-- ── Join by Session ID ─────────────────────────────────────────────── -->
+    <div class="pb-card p-6 space-y-4">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:12px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🔗</div>
             <div>
+                <h2 class="font-semibold" style="color:var(--pb-text);">Join an election</h2>
+                <p style="font-size:0.78rem;color:var(--pb-muted2);">Enter a Session ID shared by the admin</p>
+            </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <input id="joinInput" class="flex-1 px-4 py-3 rounded-xl"
+                   placeholder="Enter Session ID  e.g. 7F2A-19KD" />
+            <button id="joinBtn" class="pb-btn pb-btn-gold">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                Join
+            </button>
+        </div>
+        <p id="joinError" style="display:none;color:var(--pb-danger);font-size:0.875rem;"></p>
+    </div>
+
+    <!-- ── Available elections ────────────────────────────────────────────── -->
+    <div class="pb-card p-5 space-y-4">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+                <h2 class="font-bold text-lg" style="color:var(--pb-text);">Available Now</h2>
+                <p style="font-size:0.78rem;color:var(--pb-muted2);margin-top:2px;">Running elections you haven't voted in yet</p>
+            </div>
+            @if (Model.AvailableElections.Count > 0)
+            {
+                <span class="pb-badge pb-badge-success" style="font-size:0.72rem;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--pb-success);display:inline-block;margin-right:4px;animation:upulse 1.5s infinite;"></span>
+                    @Model.AvailableElections.Count live
+                </span>
+            }
+        </div>
+
+        @if (Model.AvailableElections.Count == 0)
+        {
+            <div style="text-align:center;padding:36px 20px;">
+                <div style="font-size:2.5rem;margin-bottom:12px;">🗳️</div>
+                <p style="color:var(--pb-muted);font-size:0.9rem;font-weight:500;">No elections available right now.</p>
+                <p style="color:var(--pb-muted2);font-size:0.8rem;margin-top:4px;line-height:1.5;">
+                    Ask an admin for a Session ID to join one directly,<br/>or check back later.
                 </p>
             </div>
+        }
 
-                Join
+        @foreach (var el in Model.AvailableElections)
+        {
+            var typeIcon = el.Type switch {
+                "election"    => "🗳️",
+                "rating"      => "⭐",
+                "text"        => "📝",
+                "multichoice" => "☑️",
+                "ranking"     => "🏆",
+                _             => "📊"
+            };
+            var typeLabel = el.Type switch {
+                "election"    => "Election",
+                "rating"      => "Rating",
+                "text"        => "Text",
+                "multichoice" => "Multi-choice",
+                "ranking"     => "Ranking",
+                _             => el.Type
+            };
+
+            <div class="pb-card-flat" style="padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
+                        <div style="width:42px;height:42px;border-radius:13px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                    display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">@typeIcon</div>
+                        <div style="min-width:0;">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <p style="font-weight:700;color:var(--pb-text);font-size:0.95rem;word-break:break-word;">@el.Title</p>
+                                <span class="pb-badge pb-badge-success" style="font-size:0.68rem;">
+                                    <span style="width:5px;height:5px;border-radius:50%;background:var(--pb-success);display:inline-block;margin-right:3px;animation:upulse 1.5s infinite;"></span>
+                                    Live
+                                </span>
+                                <span class="pb-badge pb-badge-gold" style="font-size:0.68rem;">@typeLabel</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap;">
+                                <span style="font-size:0.75rem;color:var(--pb-muted2);">Session:</span>
+                                <code style="font-size:0.75rem;font-family:monospace;letter-spacing:0.08em;
+                                             background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                             color:var(--pb-gold);padding:2px 8px;border-radius:6px;">@el.SessionId</code>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/Poll/Take?session=@el.SessionId" class="pb-btn pb-btn-gold text-sm" style="flex-shrink:0;padding:0.55rem 1.1rem;">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg>
+                        Vote Now
+                    </a>
+                </div>
             </div>
-        </div>
-    </a>
-
-    <!-- Available polls (mock) -->
-        <div class="flex items-center justify-between">
-        </div>
-
-            <div class="space-y-1">
-            </div>
-
-                Start
-            </a>
-        </div>
-
-            <div class="space-y-1">
-            </div>
-
-                Start
-            </a>
-        </div>
+        }
     </div>
 
 </section>
 
+<style>
+    @@keyframes upulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+
 @section Scripts {
     <script>
         (() => {
-          const pending = localStorage.getItem("pb_pendingSession");
-          const card = document.getElementById("pendingJoinCard");
-          const text = document.getElementById("pendingSessionText");
-          const btn = document.getElementById("pendingJoinBtn");
-
-          if (pending && card && text && btn) {
-            text.textContent = pending;
-            card.classList.remove("hidden");
-
-            btn.addEventListener("click", () => {
-              window.location.href = `/Poll/Take?session=${encodeURIComponent(pending)}`;
+            const btn   = document.getElementById('joinBtn');
+            const input = document.getElementById('joinInput');
+            const err   = document.getElementById('joinError');
+            btn?.addEventListener('click', () => {
+                const s = (input.value || '').trim();
+                if (!s) { err.textContent = 'Please enter a Session ID.'; err.style.display = 'block'; return; }
+                err.style.display = 'none';
+                window.location.href = '/Poll/Take?session=' + encodeURIComponent(s);
             });
-          }
+            input?.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
         })();
     </script>
 }

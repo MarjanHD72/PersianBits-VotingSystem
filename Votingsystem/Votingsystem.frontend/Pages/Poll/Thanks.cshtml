@@ -1,13 +1,58 @@
 ﻿@page
 @model Votingsystem.frontend.Pages.Poll.ThanksModel
 @{
-    ViewData["Title"] = "Thank you";
+    ViewData["Title"] = "Vote Recorded";
 }
 
-<section class="min-h-[70vh] flex items-center justify-center">
-    <div class="max-w-xl text-center space-y-4">
-        <h1 class="text-3xl font-semibold" style="color: var(--pb-text);">Thank you!</h1>
-        <p style="color: var(--pb-muted);">Your vote has been recorded.</p>
-        <a asp-page="/User/Dashboard" class="pb-btn pb-btn-gold">Back to Dashboard</a>
+<style>
+    @@keyframes popIn {
+        0%   { transform: scale(0.5); opacity: 0; }
+        70%  { transform: scale(1.15); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .thanks-icon  { animation: popIn  0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
+    .thanks-title { animation: fadeUp 0.45s ease 0.25s both; }
+    .thanks-sub   { animation: fadeUp 0.45s ease 0.40s both; }
+    .thanks-btn   { animation: fadeUp 0.45s ease 0.55s both; }
+</style>
+
+<section class="min-h-[80vh] flex items-center justify-center px-4">
+    <div class="w-full max-w-md text-center space-y-6">
+
+        <div class="pb-card p-10 space-y-6">
+            <!-- Icon -->
+            <div class="thanks-icon" style="display:inline-flex;width:80px;height:80px;border-radius:50%;
+                        background:var(--pb-successBg);border:2px solid var(--pb-successBdr);
+                        align-items:center;justify-content:center;font-size:2.4rem;
+                        box-shadow:0 0 32px rgba(52,211,153,0.20);">
+                ✅
+            </div>
+
+            <!-- Text -->
+            <div class="thanks-title space-y-2">
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Vote Recorded!</h1>
+                <p style="color:var(--pb-muted);font-size:0.92rem;line-height:1.6;">
+                    Your response has been securely submitted.<br/>
+                    Thank you for participating.
+                </p>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:1px;background:var(--pb-border2);"></div>
+
+            <!-- Buttons -->
+            <div class="thanks-btn flex flex-col sm:flex-row gap-3 justify-center">
+                <a asp-page="/User/Dashboard" class="pb-btn pb-btn-gold" style="padding:0.7rem 1.6rem;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m10-11l2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/></svg>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <p style="font-size:0.75rem;color:var(--pb-muted2);">PersianBits Voting Centre &middot; Secure &amp; Transparent</p>
     </div>
 </section>

@@ -1,0 +1,65 @@
+@page
+@model Votingsystem.frontend.Pages.Admin.Builders.RatingScaleModel
+@{ ViewData["Title"] = "Rating Scale Builder"; }
+
+<section class="max-w-3xl mx-auto space-y-6 px-2 sm:px-4">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                        display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">⭐</div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Rating Scale Builder</h1>
+                <p style="color:var(--pb-muted);font-size:0.85rem;margin-top:2px;">Users will rate on a scale of 1 to 5</p>
+            </div>
+        </div>
+        <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back
+        </a>
+    </div>
+
+    <form method="post" class="space-y-6">
+        <div class="pb-card p-6 space-y-5">
+            <h2 style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);">Question Details</h2>
+
+            <div class="space-y-1">
+                <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Question / Title</label>
+                <input name="Title" value="@Model.Title"
+                       class="w-full px-4 py-3 rounded-xl"
+                       placeholder="e.g. How would you rate the event?" />
+            </div>
+            <div class="space-y-1">
+                <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">
+                    Description <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span>
+                </label>
+                <textarea name="Description" rows="3" class="w-full px-4 py-3 rounded-xl"
+                          placeholder="Additional context for voters…">@Model.Description</textarea>
+            </div>
+
+            <!-- Preview -->
+            <div style="padding:16px;border-radius:14px;background:var(--pb-glass2);border:1px solid var(--pb-border2);">
+                <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);margin-bottom:10px;">Voter Preview</p>
+                <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                    @foreach (var (emoji, n) in new[]{("😕",1),("😐",2),("🙂",3),("😊",4),("🤩",5)})
+                    {
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+                            <div style="width:48px;height:48px;border-radius:14px;background:var(--pb-glass);border:1.5px solid var(--pb-border);
+                                        display:flex;align-items:center;justify-content:center;font-size:1.4rem;">@emoji</div>
+                            <span style="font-size:0.72rem;color:var(--pb-muted2);">@n</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline">Cancel</a>
+            <button type="submit" class="pb-btn pb-btn-gold" style="padding:0.7rem 2rem;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                Save
+            </button>
+        </div>
+    </form>
+</section>

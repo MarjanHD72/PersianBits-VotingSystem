@@ -2,140 +2,129 @@
 @model Votingsystem.frontend.Pages.Admin.UsersModel
 @{
     ViewData["Title"] = "Users";
+    var totalUsers  = Model.UserList.Count;
+    var activeUsers = Model.UserList.Count(u => u.IsActive);
+    var adminUsers  = Model.UserList.Count(u => u.Role == "Admin");
 }
-
-@*
-    USERS (Admin) 
-    Purpose:
-    - Admin can view users and basic info
-        - Load users from Database
-        - Support searching/filterin
-        - View full user profile and activity
-*@
 
 <section class="max-w-6xl mx-auto space-y-6">
 
     <!-- Header -->
-    <div class="flex items-start justify-between gap-4">
-        <div class="space-y-1">
-            <h1 class="text-2xl font-semibold">Users</h1>
-            <p class="text-slate-400">Manage voters and creators. Frontend prototype (mock data).</p>
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                        display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👥</div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Users</h1>
+                <p style="color:var(--pb-muted);font-size:0.85rem;margin-top:2px;">Manage voters and creators</p>
+            </div>
         </div>
-
-        <a asp-page="/Admin/Dashboard"
-           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
-            Back
+        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Dashboard
         </a>
     </div>
 
-    <!-- Search -->
-    <div>
-        <input class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                   focus:outline-none focus:ring-2 focus:ring-indigo-500"
-               placeholder="Search by name, username, email..." />
-    </div>
-
-    <!-- Users list -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 overflow-hidden">
-        <div class="px-5 py-4 flex items-center justify-between">
-            <h2 class="font-semibold">User List</h2>
-            <span class="text-xs text-slate-400">Mock data</span>
+    <!-- KPI row -->
+    <div class="grid grid-cols-3 gap-4">
+        <div class="pb-stat-card text-center" style="padding:16px;">
+            <p class="pb-stat-label">Total</p>
+            <p class="pb-stat-value" style="font-size:1.6rem;">@totalUsers</p>
         </div>
-
-        <div class="divide-y divide-slate-800">
-
-            <!-- User row -->
-            <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center">
-                        <span class="text-indigo-300 font-semibold">M</span>
-                    </div>
-                    <div>
-                        <p class="font-medium">Mamad Saberi <span class="text-slate-400 text-sm">@@mamad</span></p>
-                        <p class="text-sm text-slate-400">mamad@example.com</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
-                        Active
-                    </span>
-
-                    <a asp-page="/Admin/UserDetails"
-                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
-                        View
-                    </a>
-                    <button type="button"
-                            class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
-                        Disable
-                    </button>
-                </div>
-            </div>
-
-            <!-- User row -->
-            <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center">
-                        <span class="text-slate-200 font-semibold">S</span>
-                    </div>
-                    <div>
-                        <p class="font-medium">Sara Mohammadi <span class="text-slate-400 text-sm">@@sara_m</span></p>
-                        <p class="text-sm text-slate-400">sara@example.com</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
-                        Active
-                    </span>
-                    <span class="text-xs px-2 py-1 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30">
-                        User
-                    </span>
-
-                    <a asp-page="/Admin/UserDetails"
-                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
-                        View
-                    </a>
-                    <button type="button"
-                            class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
-                        Disable
-                    </button>
-                </div>
-            </div>
-
-            <!-- User row -->
-            <div class="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center">
-                        <span class="text-slate-200 font-semibold">A</span>
-                    </div>
-                    <div>
-                        <p class="font-medium">Ali Rezaei <span class="text-slate-400 text-sm">@@ali_r</span></p>
-                        <p class="text-sm text-slate-400">ali@example.com</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
-                        Active
-                    </span>
-
-                    <a asp-page="/Admin/UserDetails"
-                       class="px-3 py-2 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-sm">
-                        View
-                    </a>
-                    <button type="button"
-                            class="px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 text-sm text-rose-300">
-                        Disable
-                    </button>
-                </div>
-            </div>
-
+        <div class="pb-stat-card text-center" style="padding:16px;">
+            <p class="pb-stat-label">Active</p>
+            <p class="pb-stat-value" style="font-size:1.6rem;color:var(--pb-success);">@activeUsers</p>
+        </div>
+        <div class="pb-stat-card text-center" style="padding:16px;">
+            <p class="pb-stat-label">Admins</p>
+            <p class="pb-stat-value" style="font-size:1.6rem;color:var(--pb-gold);">@adminUsers</p>
         </div>
     </div>
 
-    <p class="text-xs text-slate-500">
-        Backend later: search, pagination, real actions (disable/approve), and audit logs.
-    </p>
+    <!-- Search + list card -->
+    <div class="pb-card overflow-hidden">
+
+        <!-- Card header with search -->
+        <div style="padding:18px 20px;border-bottom:1px solid var(--pb-border2);display:flex;flex-col:column;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div>
+                    <h2 class="font-bold" style="color:var(--pb-text);">User List</h2>
+                    <p style="font-size:0.75rem;color:var(--pb-muted2);margin-top:2px;">
+                        @(string.IsNullOrEmpty(Model.Search) ? $"{totalUsers} users total" : $"{totalUsers} results for \"{Model.Search}\"")
+                    </p>
+                </div>
+            </div>
+            <form method="get" style="margin-top:12px;">
+                <div style="position:relative;">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                         style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--pb-muted2);pointer-events:none;">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input name="Search" value="@Model.Search"
+                           style="padding-left:42px;"
+                           class="w-full px-4 py-3 rounded-xl"
+                           placeholder="Search by name or email…" />
+                </div>
+            </form>
+        </div>
+
+        @if (Model.UserList.Count == 0)
+        {
+            <div style="padding:40px 20px;text-align:center;">
+                <div style="font-size:2rem;margin-bottom:10px;">🔍</div>
+                <p style="color:var(--pb-muted);font-size:0.9rem;">No users found.</p>
+            </div>
+        }
+
+        @foreach (var u in Model.UserList)
+        {
+            <div style="padding:16px 20px;border-top:1px solid var(--pb-border2);
+                        display:flex;flex-direction:column;gap:12px;transition:background 0.15s ease;"
+                 class="sm:flex-row sm:items-center sm:justify-between">
+                <!-- Left: avatar + info -->
+                <div style="display:flex;align-items:center;gap:14px;min-width:0;flex:1;">
+                    <div class="pb-avatar" style="width:44px;height:44px;border-radius:14px;font-size:1.3rem;flex-shrink:0;">@u.Avatar</div>
+                    <div style="min-width:0;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <p style="font-weight:700;color:var(--pb-text);font-size:0.95rem;">@u.FullName</p>
+                            @if (u.Role == "Admin")
+                            {
+                                <span class="pb-badge pb-badge-gold" style="font-size:0.68rem;">Admin</span>
+                            }
+                            else
+                            {
+                                <span class="pb-badge pb-badge-draft" style="font-size:0.68rem;">User</span>
+                            }
+                            @if (u.IsActive)
+                            {
+                                <span class="pb-badge pb-badge-success" style="font-size:0.68rem;">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pb-badge pb-badge-danger" style="font-size:0.68rem;">Disabled</span>
+                            }
+                        </div>
+                        <p style="font-size:0.8rem;color:var(--pb-muted2);margin-top:3px;">@u.Email</p>
+                        <p style="font-size:0.72rem;color:var(--pb-muted2);margin-top:1px;">
+                            Joined @u.CreatedAt.ToString("MMM dd, yyyy")
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right: actions -->
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;">
+                    <form method="post" asp-page-handler="Disable" style="margin:0;">
+                        <input type="hidden" name="id" value="@u.Id" />
+                        <button type="submit"
+                                class="pb-btn text-sm @(u.IsActive ? "pb-btn-danger-outline" : "pb-btn-outline")"
+                                style="padding:0.4rem 0.9rem;">
+                            @(u.IsActive ? "Disable" : "Enable")
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+
+    </div>
 
 </section>

@@ -4,126 +4,140 @@
     ViewData["Title"] = "Create Content";
 }
 
-@*
-  CREATE CONTENT (Admin)
-*@
-
-<section class="max-w-5xl mx-auto space-y-6">
+<section class="max-w-5xl mx-auto space-y-8">
 
     <!-- Header -->
-    <div class="flex items-start justify-between gap-4">
-        <div class="space-y-1">
-            <h1 class="text-2xl font-semibold">Create content</h1>
-            <p class="text-slate-400">Election is the main feature. Other question types are optional.</p>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                        display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">✨</div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Create Content</h1>
+                <p style="color:var(--pb-muted);font-size:0.85rem;margin-top:2px;">Choose an election type to get started</p>
+            </div>
         </div>
-
-        <a asp-page="/Admin/Dashboard"
-           class="px-4 py-3 rounded-xl border border-slate-800 hover:bg-slate-800/60">
-            Back
+        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Dashboard
         </a>
     </div>
 
     <!-- Featured: Election -->
-    <a asp-page="/Admin/Builders/Election"
-       class="group block rounded-3xl border border-[#D4AF37]/30 bg-[#D4AF37]/10 p-7 hover:bg-[#D4AF37]/15 transition">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div class="space-y-2">
-                <p class="text-xs uppercase tracking-wider text-[#D4AF37]/80">Core feature</p>
-                <h2 class="text-2xl font-semibold">Election</h2>
-                <p class="text-slate-300 max-w-2xl">
-                    Create a candidate-based election with images and descriptions. Users can open each candidate
-                    to read details before voting.
-                </p>
-
-                <div class="flex flex-wrap gap-2 pt-2">
-                    <span class="text-xs px-2 py-1 rounded-full border border-[#D4AF37]/30 text-[#D4AF37]">
-                        Candidate profiles
-                    </span>
-                    <span class="text-xs px-2 py-1 rounded-full border border-[#D4AF37]/30 text-[#D4AF37]">
-                        One vote (or configurable later)
-                    </span>
-                    <span class="text-xs px-2 py-1 rounded-full border border-[#D4AF37]/30 text-[#D4AF37]">
-                        Clean user voting UI
-                    </span>
+    <a asp-page="/Admin/Builders/Election" style="text-decoration:none;display:block;">
+        <div class="pb-card" style="padding:28px;border-color:var(--pb-goldBorder);background:var(--pb-goldSubtle);
+                                     transition:all 0.2s ease;cursor:pointer;"
+             onmouseover="this.style.boxShadow='var(--pb-shadowGlow)';this.style.transform='translateY(-2px)'"
+             onmouseout="this.style.boxShadow='var(--pb-shadow)';this.style.transform='none'">
+            <div style="display:flex;flex-direction:column;gap:20px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:50px;height:50px;border-radius:16px;background:rgba(212,175,55,0.20);border:1px solid var(--pb-goldBorder);
+                                    display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">🗳️</div>
+                        <div>
+                            <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);margin-bottom:3px;">Core Feature</p>
+                            <h2 class="text-2xl font-bold" style="color:var(--pb-text);">Election</h2>
+                        </div>
+                    </div>
+                    <div class="pb-btn pb-btn-gold" style="flex-shrink:0;">
+                        Create Election
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </div>
                 </div>
-            </div>
-
-            <div class="shrink-0">
-                <span class="inline-flex items-center justify-center px-5 py-3 rounded-2xl font-semibold
-                             bg-[#D4AF37] text-slate-950
-                             group-hover:bg-[#FFC94A] transition
-                             shadow-[0_0_30px_rgba(99,102,241,0.30)]">
-                    Create Election
-                </span>
+                <p style="color:var(--pb-muted);font-size:0.9rem;line-height:1.6;max-width:600px;">
+                    Create a candidate-based election with photos and descriptions. Voters browse each candidate before submitting their choice.
+                </p>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <span class="pb-badge pb-badge-gold" style="font-size:0.75rem;">Candidate profiles</span>
+                    <span class="pb-badge pb-badge-gold" style="font-size:0.75rem;">Photo support</span>
+                    <span class="pb-badge pb-badge-gold" style="font-size:0.75rem;">One vote per user</span>
+                    <span class="pb-badge pb-badge-gold" style="font-size:0.75rem;">Real-time results</span>
+                </div>
             </div>
         </div>
     </a>
 
-    <!-- Secondary types -->
-    <div class="text-sm text-slate-400 pt-2">OTHER QUESTION TYPES</div>
+    <!-- Section label -->
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div style="height:1px;flex:1;background:var(--pb-border2);"></div>
+        <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-muted2);white-space:nowrap;">Other Question Types</p>
+        <div style="height:1px;flex:1;background:var(--pb-border2);"></div>
+    </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Secondary types grid -->
+    <div class="grid sm:grid-cols-2 gap-4">
 
-        <!-- Multichoice -->
-        <a asp-page="/Admin/Builders/Multichoice"
-           class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-5 hover:bg-slate-900/70 transition">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-semibold">Multichoice</h3>
-                    <p class="text-sm text-slate-400 mt-1">Select one or more choices from a list.</p>
+        <a asp-page="/Admin/Builders/Multichoice" style="text-decoration:none;">
+            <div class="pb-card" style="padding:20px;cursor:pointer;transition:all 0.2s ease;height:100%;"
+                 onmouseover="this.style.borderColor='var(--pb-goldBorder)';this.style.transform='translateY(-2px)'"
+                 onmouseout="this.style.borderColor='var(--pb-border)';this.style.transform='none'">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                        <div style="width:44px;height:44px;border-radius:13px;background:var(--pb-glass2);border:1px solid var(--pb-border);
+                                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">☑️</div>
+                        <div>
+                            <h3 class="font-bold" style="color:var(--pb-text);">Multichoice</h3>
+                            <p style="font-size:0.82rem;color:var(--pb-muted);margin-top:4px;line-height:1.5;">Select one or more choices from a list.</p>
+                        </div>
+                    </div>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;margin-top:4px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </div>
-                <span class="text-xs px-2 py-1 rounded-full border border-slate-700 text-slate-300">
-                    Open
-                </span>
             </div>
         </a>
 
-        <!-- Text -->
-        <a asp-page="/Admin/Builders/Text"
-           class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-5 hover:bg-slate-900/70 transition">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-semibold">Text response</h3>
-                    <p class="text-sm text-slate-400 mt-1">Collect open-ended written responses.</p>
+        <a asp-page="/Admin/Builders/Text" style="text-decoration:none;">
+            <div class="pb-card" style="padding:20px;cursor:pointer;transition:all 0.2s ease;height:100%;"
+                 onmouseover="this.style.borderColor='var(--pb-goldBorder)';this.style.transform='translateY(-2px)'"
+                 onmouseout="this.style.borderColor='var(--pb-border)';this.style.transform='none'">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                        <div style="width:44px;height:44px;border-radius:13px;background:var(--pb-glass2);border:1px solid var(--pb-border);
+                                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">📝</div>
+                        <div>
+                            <h3 class="font-bold" style="color:var(--pb-text);">Text Response</h3>
+                            <p style="font-size:0.82rem;color:var(--pb-muted);margin-top:4px;line-height:1.5;">Collect open-ended written responses.</p>
+                        </div>
+                    </div>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;margin-top:4px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </div>
-                <span class="text-xs px-2 py-1 rounded-full border border-slate-700 text-slate-300">
-                    Open
-                </span>
             </div>
         </a>
 
-        <!-- Rating scale -->
-        <a asp-page="/Admin/Builders/RatingScale"
-           class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-5 hover:bg-slate-900/70 transition">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-semibold">Rating scale</h3>
-                    <p class="text-sm text-slate-400 mt-1">Users rate on a numeric scale.</p>
+        <a asp-page="/Admin/Builders/RatingScale" style="text-decoration:none;">
+            <div class="pb-card" style="padding:20px;cursor:pointer;transition:all 0.2s ease;height:100%;"
+                 onmouseover="this.style.borderColor='var(--pb-goldBorder)';this.style.transform='translateY(-2px)'"
+                 onmouseout="this.style.borderColor='var(--pb-border)';this.style.transform='none'">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                        <div style="width:44px;height:44px;border-radius:13px;background:var(--pb-glass2);border:1px solid var(--pb-border);
+                                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">⭐</div>
+                        <div>
+                            <h3 class="font-bold" style="color:var(--pb-text);">Rating Scale</h3>
+                            <p style="font-size:0.82rem;color:var(--pb-muted);margin-top:4px;line-height:1.5;">Users rate on a 1–5 numeric scale.</p>
+                        </div>
+                    </div>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;margin-top:4px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </div>
-                <span class="text-xs px-2 py-1 rounded-full border border-slate-700 text-slate-300">
-                    Open
-                </span>
             </div>
         </a>
 
-        <!-- Ranking -->
-        <a asp-page="/Admin/Builders/Ranking"
-           class="group rounded-2xl border border-slate-800 bg-slate-900/40 p-5 hover:bg-slate-900/70 transition">
-            <div class="flex items-start justify-between gap-4">
-                <div>
-                    <h3 class="text-lg font-semibold">Ranking</h3>
-                    <p class="text-sm text-slate-400 mt-1">Rank options by preference.</p>
+        <a asp-page="/Admin/Builders/Ranking" style="text-decoration:none;">
+            <div class="pb-card" style="padding:20px;cursor:pointer;transition:all 0.2s ease;height:100%;"
+                 onmouseover="this.style.borderColor='var(--pb-goldBorder)';this.style.transform='translateY(-2px)'"
+                 onmouseout="this.style.borderColor='var(--pb-border)';this.style.transform='none'">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                        <div style="width:44px;height:44px;border-radius:13px;background:var(--pb-glass2);border:1px solid var(--pb-border);
+                                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏆</div>
+                        <div>
+                            <h3 class="font-bold" style="color:var(--pb-text);">Ranking</h3>
+                            <p style="font-size:0.82rem;color:var(--pb-muted);margin-top:4px;line-height:1.5;">Users drag to rank items by preference.</p>
+                        </div>
+                    </div>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;margin-top:4px;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </div>
-                <span class="text-xs px-2 py-1 rounded-full border border-slate-700 text-slate-300">
-                    Open
-                </span>
             </div>
         </a>
 
     </div>
-
-    <p class="text-xs text-slate-500">
-        Note: Builder pages are placeholders unless you create them. Next we’ll create the Election builder first.
-    </p>
 
 </section>

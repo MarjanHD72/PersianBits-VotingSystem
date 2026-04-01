@@ -23,7 +23,7 @@
                           opacity 0.35s ease;
         }
 
-        /* ---------- DARK MODE (your existing colors, preserved exactly) ---------- */
+        /* ---------- DARK MODE ---------- */
         [data-theme="dark"] {
             --pb-bg:          #0D0D0D;
             --pb-bg2:         #121212;
@@ -427,27 +427,32 @@
                         <div class="knob" id="themeKnob"></div>
                     </button>
 
-                    <a id="navLogin" asp-page="/Auth/Login" class="pb-btn pb-btn-gold text-sm">Login</a>
-                    <a id="navDashboard" href="#" style="display:none;" class="pb-btn pb-btn-outline text-sm">Dashboard</a>
-
-                    <!-- Avatar (profile link) -->
-                    <a id="navAvatarLink" href="#" style="display:none; text-decoration:none;">
-                        <div id="navAvatar" style="
-                            width: 36px; height: 36px; border-radius: 50%;
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 1.2rem; cursor: pointer;
-                            background: var(--pb-avatarBg); border: 1.5px solid var(--pb-avatarBdr);
-                            transition: all 0.2s ease;
-                        "></div>
-                    </a>
-
-                    <button id="navLogout" type="button" style="display:none;" class="pb-btn pb-btn-outline text-sm">Logout</button>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        var isAdmin = User.IsInRole("Admin");
+                        var avatarVal = User.FindFirst("Avatar")?.Value ?? "😀";
+                        <a asp-page="@(isAdmin ? "/Admin/Dashboard" : "/User/Dashboard")" class="pb-btn pb-btn-outline text-sm">Dashboard</a>
+                        <a href="@(isAdmin ? "/Admin/Profile" : "/User/Profile")" style="text-decoration:none;"
+                           onmouseenter="this.firstElementChild.style.borderColor='var(--pb-gold)';this.firstElementChild.style.boxShadow='0 0 12px rgba(212,175,55,0.35)'"
+                           onmouseleave="this.firstElementChild.style.borderColor='var(--pb-avatarBdr)';this.firstElementChild.style.boxShadow='none'">
+                            <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+                                        font-size:1.2rem;cursor:pointer;background:var(--pb-avatarBg);
+                                        border:1.5px solid var(--pb-avatarBdr);transition:all 0.2s ease;">@avatarVal</div>
+                        </a>
+                        <form method="post" asp-page="/Auth/Logout" style="display:inline;margin:0;">
+                            <button type="submit" class="pb-btn pb-btn-outline text-sm">Logout</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-page="/Auth/Login" class="pb-btn pb-btn-gold text-sm">Login</a>
+                    }
                 </nav>
 
             </div>
         </header>
 
-        <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
+        <main class="max-w-6xl mx-auto px-4 pb-8 w-full flex-1">
             @RenderBody()
         </main>
 
@@ -553,68 +558,6 @@
           }
           applyTheme(getTheme());
           toggle.addEventListener('click', () => applyTheme(getTheme() === 'dark' ? 'light' : 'dark'));
-
-          // ===== AUTH NAV + AVATAR =====
-          const avatarEmojis = [
-            '😀','😎','🤠','🥳','😺','🦊','🐶','🐱','🐻','🐼',
-            '🦁','🐯','🐸','🐵','🦉','🦄','🐲','🐙','🦋','🌸',
-            '🌻','⭐','🔥','💎','🎯','🎮','🎨','🎵','🚀','🏆',
-            '🎭','🎪','🧊','🌈','🍀','🎲','👻','🤖','👽','🧙'
-          ];
-
-          function getAvatar() {
-            let av = localStorage.getItem('pb_avatar');
-            if (!av) {
-              av = avatarEmojis[Math.floor(Math.random() * avatarEmojis.length)];
-              localStorage.setItem('pb_avatar', av);
-            }
-            return av;
-          }
-
-          const isLoggedIn = localStorage.getItem("pb_isLoggedIn") === "true";
-          const isCreator = localStorage.getItem("pb_isApprovedCreator") === "true";
-          const login = document.getElementById("navLogin");
-          const dash = document.getElementById("navDashboard");
-          const logout = document.getElementById("navLogout");
-          const avatarLink = document.getElementById("navAvatarLink");
-          const avatarEl = document.getElementById("navAvatar");
-
-          function showEl(el) { if (el) el.style.display = 'inline-flex'; }
-          function hideEl(el) { if (el) el.style.display = 'none'; }
-
-          if (isLoggedIn) {
-            hideEl(login);
-            showEl(dash);
-            showEl(logout);
-            showEl(avatarLink);
-
-            dash.href = isCreator ? "/Admin/Dashboard" : "/User/Dashboard";
-            avatarLink.href = isCreator ? "/Admin/Profile" : "/User/Profile";
-            avatarEl.textContent = getAvatar();
-
-            // Hover glow on avatar
-            avatarLink.addEventListener('mouseenter', () => {
-              avatarEl.style.borderColor = 'var(--pb-gold)';
-              avatarEl.style.boxShadow = '0 0 12px rgba(212,175,55,0.35)';
-            });
-            avatarLink.addEventListener('mouseleave', () => {
-              avatarEl.style.borderColor = 'var(--pb-avatarBdr)';
-              avatarEl.style.boxShadow = 'none';
-            });
-
-            logout.onclick = () => {
-              localStorage.removeItem("pb_isLoggedIn");
-              localStorage.removeItem("pb_isApprovedCreator");
-              localStorage.removeItem("pb_userEmail");
-              localStorage.removeItem("pb_requestedCreator");
-              window.location.href = "/Index";
-            };
-          } else {
-            showEl(login);
-            hideEl(dash);
-            hideEl(logout);
-            hideEl(avatarLink);
-          }
         })();
     
     let chatHistory = [];

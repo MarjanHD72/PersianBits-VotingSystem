@@ -1,189 +1,214 @@
 ﻿@page
 @model Votingsystem.frontend.Pages.Admin.ResultsModel
-@{
-    ViewData["Title"] = "Results";
-}
+@{ ViewData["Title"] = Model.Election != null ? $"Results – {Model.Election.Title}" : "Results"; }
 
-@*
-  RESULTS PAGE
-  Reads ?type= from query string to show the right layout:
-    - election  → candidate bar chart 
-    - rating    → star/scale breakdown
-    - text      → list of submitted text responses
-*@
+<section class="max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
-<section class="max-w-4xl mx-auto space-y-6">
-    <div class="flex items-start justify-between gap-4">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
-            <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">Results</h1>
-            <p id="resultSubtitle" style="color: var(--pb-muted);" class="mt-1"></p>
+            <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Results</h1>
+            @if (Model.Election != null)
+            {
+                <p style="color:var(--pb-muted);margin-top:4px;">@Model.Election.Title</p>
+            }
         </div>
-
-        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm">Back</a>
+        <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Dashboard
+        </a>
     </div>
 
-    <!-- Election Results -->
-    <div id="electionResults" style="display:none;" class="pb-card p-6 space-y-5">
-        <div class="flex items-center justify-between">
-            <h2 id="electionTitle" class="text-lg font-semibold" style="color: var(--pb-text);"></h2>
-            <span class="pb-badge pb-badge-success">Election</span>
+    @if (Model.Election == null)
+    {
+        <div class="pb-card p-8 text-center space-y-4">
+            <div style="font-size:2.5rem;">🔍</div>
+            <p style="color:var(--pb-muted);">Election not found.</p>
+            <a asp-page="/Admin/Dashboard" class="pb-btn pb-btn-outline" style="display:inline-flex;">Back to Dashboard</a>
         </div>
-
-        <div class="space-y-4" id="electionBars"></div>
-
-        <div class="flex items-center justify-between pt-3" style="border-top: 1px solid var(--pb-border2);">
-            <span style="color: var(--pb-muted2); font-size: 0.85rem;" id="electionTotal"></span>
-            <span class="pb-badge pb-badge-draft" id="electionWinner"></span>
-        </div>
-    </div>
-
-    <!-- Rating Results -->
-    <div id="ratingResults" style="display:none;" class="pb-card p-6 space-y-5">
-        <div class="flex items-center justify-between">
-            <h2 id="ratingTitle" class="text-lg font-semibold" style="color: var(--pb-text);"></h2>
-            <span class="pb-badge pb-badge-warning">Rating Scale</span>
-        </div>
-
-        <!-- Average -->
-        <div class="text-center pb-4" style="border-bottom: 1px solid var(--pb-border2);">
-            <p id="ratingAvg" style="font-size: 3rem; font-weight: 800; color: var(--pb-gold); line-height: 1;"></p>
-            <p style="color: var(--pb-muted2); font-size: 0.85rem; margin-top: 4px;" id="ratingAvgLabel"></p>
-        </div>
-
-        <div class="space-y-3" id="ratingBars"></div>
-
-        <span style="color: var(--pb-muted2); font-size: 0.85rem;" id="ratingTotal"></span>
-    </div>
-
-    <!-- Text Response Results -->
-    <div id="textResults" style="display:none;" class="space-y-4">
-        <div class="pb-card p-6">
-            <div class="flex items-center justify-between">
-                <h2 id="textTitle" class="text-lg font-semibold" style="color: var(--pb-text);"></h2>
-                <span class="pb-badge pb-badge-gold">Text Responses</span>
+    }
+    else
+    {
+        <div class="pb-card p-5">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div style="width:44px;height:44px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                            display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">
+                    @(Model.Election.Type switch { "election" => "🗳️", "rating" => "⭐", "text" => "📝", "multichoice" => "☑️", "ranking" => "🏆", _ => "📊" })
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span style="font-weight:700;color:var(--pb-text);font-size:1rem;">@Model.Election.Title</span>
+                        <span class="pb-badge pb-badge-gold" style="font-size:0.7rem;">@Model.Election.Type.ToUpper()</span>
+                        @if (Model.Election.Status == "running")
+                        {
+                            <span class="pb-badge pb-badge-success" style="font-size:0.7rem;">
+                                <span style="width:5px;height:5px;border-radius:50%;background:var(--pb-success);display:inline-block;margin-right:3px;animation:rpulse 1.5s infinite;"></span>
+                                Live
+                            </span>
+                        }
+                        else if (Model.Election.Status == "closed")
+                        {
+                            <span class="pb-badge pb-badge-danger" style="font-size:0.7rem;">Closed</span>
+                        }
+                    </div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <p style="font-size:1.4rem;font-weight:800;color:var(--pb-text);">@Model.TotalVotes</p>
+                    <p style="font-size:0.72rem;color:var(--pb-muted2);text-transform:uppercase;letter-spacing:0.06em;">Total Vote@(Model.TotalVotes == 1 ? "" : "s")</p>
+                </div>
             </div>
-            <p style="color: var(--pb-muted2); font-size: 0.85rem; margin-top: 8px;" id="textCount"></p>
         </div>
 
-        <div class="space-y-3" id="textList"></div>
-    </div>
+        @if (Model.Election.Type == "election")
+        {
+            if (Model.CandidateResults.Count == 0)
+            {
+                <div class="pb-card p-8 text-center">
+                    <div style="font-size:2rem;margin-bottom:10px;">🗳️</div>
+                    <p style="color:var(--pb-muted2);">No votes yet. Share the election to get started.</p>
+                </div>
+            }
+            else
+            {
+                <div class="pb-card p-6" style="border-color:var(--pb-goldBorder);background:var(--pb-goldSubtle);">
+                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                        <div style="font-size:2.5rem;">👑</div>
+                        <div style="flex:1;min-width:0;">
+                            <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);margin-bottom:4px;">Winner</p>
+                            <p style="font-size:1.3rem;font-weight:800;color:var(--pb-text);">@Model.CandidateResults.First().Name</p>
+                            <p style="font-size:0.85rem;color:var(--pb-muted);margin-top:2px;">@Model.CandidateResults.First().Votes votes · @Model.CandidateResults.First().Percentage% of total</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="pb-card p-6 space-y-5">
+                    <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">All Candidates</h3>
+                    @{ var rk = 1; }
+                    @foreach (var c in Model.CandidateResults)
+                    {
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
+                                <span style="display:flex;align-items:center;gap:8px;">
+                                    <span style="font-size:0.85rem;font-weight:700;color:@(rk == 1 ? "var(--pb-gold)" : "var(--pb-muted2)");">@(rk).</span>
+                                    <span style="font-weight:600;color:var(--pb-text);font-size:0.95rem;">@c.Name</span>
+                                </span>
+                                <span style="color:var(--pb-muted2);font-size:0.82rem;">@c.Votes vote@(c.Votes == 1 ? "" : "s") · @c.Percentage%</span>
+                            </div>
+                            <div class="pb-progress" style="height:8px;">
+                                <div class="pb-progress-fill" style="width:@(c.Percentage)%;@(rk == 1 ? "" : "filter:brightness(0.65);")"></div>
+                            </div>
+                        </div>
+                        rk++;
+                    }
+                    <div style="border-top:1px solid var(--pb-border2);padding-top:14px;">
+                        <span style="color:var(--pb-muted2);font-size:0.82rem;">@Model.TotalVotes total votes</span>
+                    </div>
+                </div>
+            }
+        }
+        else if (Model.Election.Type == "rating")
+        {
+            <div class="pb-card p-6 space-y-5">
+                <div style="text-align:center;padding:12px 0 20px;border-bottom:1px solid var(--pb-border2);">
+                    <p style="font-size:4rem;font-weight:800;color:var(--pb-gold);line-height:1;">@Model.AverageRating</p>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px;">
+                        @for (int s = 1; s <= 5; s++)
+                        {
+                            <span style="font-size:1.3rem;color:@(s <= (int)Math.Round(Model.AverageRating) ? "var(--pb-gold)" : "var(--pb-muted2)");">★</span>
+                        }
+                    </div>
+                    <p style="color:var(--pb-muted2);font-size:0.85rem;margin-top:8px;">Average from @Model.TotalVotes response@(Model.TotalVotes == 1 ? "" : "s")</p>
+                </div>
+                <div class="space-y-4">
+                    @foreach (var r in Model.RatingResults)
+                    {
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:0.875rem;">
+                                <span style="color:var(--pb-gold);font-size:1rem;">
+                                    @(new string('★', r.Stars))@(new string('☆', 5 - r.Stars))
+                                    <span style="color:var(--pb-muted2);font-size:0.78rem;margin-left:4px;">(@r.Stars)</span>
+                                </span>
+                                <span style="color:var(--pb-muted2);">@r.Count · @r.Percentage%</span>
+                            </div>
+                            <div class="pb-progress" style="height:7px;"><div class="pb-progress-fill" style="width:@(r.Percentage)%;"></div></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.Election.Type == "text")
+        {
+            <div class="pb-card p-5">
+                <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">
+                    @Model.TextResponses.Count Response@(Model.TextResponses.Count == 1 ? "" : "s")
+                </h3>
+            </div>
+            if (Model.TextResponses.Count == 0)
+            {
+                <div class="pb-card p-8 text-center">
+                    <div style="font-size:2rem;margin-bottom:10px;">📝</div>
+                    <p style="color:var(--pb-muted2);">No responses yet.</p>
+                </div>
+            }
+            @foreach (var r in Model.TextResponses)
+            {
+                <div class="pb-card p-5 space-y-3">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="width:32px;height:32px;border-radius:10px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                        display:flex;align-items:center;justify-content:center;font-size:0.9rem;">💬</div>
+                            <span style="font-weight:700;color:var(--pb-text);font-size:0.9rem;">@r.UserName</span>
+                        </div>
+                        <span style="color:var(--pb-muted2);font-size:0.73rem;">@r.SubmittedAt.ToString("MMM dd, yyyy · HH:mm")</span>
+                    </div>
+                    <p style="color:var(--pb-muted);font-size:0.9rem;line-height:1.65;padding:12px 14px;border-radius:12px;
+                              background:var(--pb-glass2);border:1px solid var(--pb-border2);">@r.Text</p>
+                </div>
+            }
+        }
+        else if (Model.Election.Type == "multichoice")
+        {
+            <div class="pb-card p-6 space-y-5">
+                <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">Results — @Model.TotalVotes voter@(Model.TotalVotes == 1 ? "" : "s")</h3>
+                @{ var mc1 = true; }
+                @foreach (var o in Model.OptionResults)
+                {
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
+                            <span style="font-weight:600;color:var(--pb-text);font-size:0.95rem;">
+                                @if (mc1) { <text>★ </text> }
+                                @o.Text
+                            </span>
+                            <span style="color:var(--pb-muted2);font-size:0.82rem;">@o.Count selected · @o.Percentage%</span>
+                        </div>
+                        <div class="pb-progress" style="height:8px;"><div class="pb-progress-fill" style="width:@(o.Percentage)%;@(mc1 ? "" : "filter:brightness(0.65);")"></div></div>
+                    </div>
+                    mc1 = false;
+                }
+            </div>
+        }
+        else if (Model.Election.Type == "ranking")
+        {
+            <div class="pb-card p-6 space-y-4">
+                <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">Ranked Results — @Model.TotalVotes voter@(Model.TotalVotes == 1 ? "" : "s")</h3>
+                @{ var rnk = 1; }
+                @foreach (var r in Model.RankingItemResults)
+                {
+                    var rankBg    = rnk == 1 ? "var(--pb-goldSubtle)" : "var(--pb-glass2)";
+                    var rankBdr   = rnk == 1 ? "var(--pb-goldBorder)" : "var(--pb-border2)";
+                    var rankColor = rnk == 1 ? "var(--pb-gold)" : rnk == 2 ? "#94a3b8" : "var(--pb-muted2)";
+                    <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:@rankBg;border:1px solid @rankBdr;">
+                        <span style="font-size:1.2rem;font-weight:800;color:@rankColor;min-width:28px;">@(rnk).</span>
+                        <span style="font-weight:600;color:var(--pb-text);font-size:0.95rem;flex:1;">@r.Text</span>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <span style="font-weight:700;color:var(--pb-text);font-size:0.9rem;">@r.Points</span>
+                            <span style="color:var(--pb-muted2);font-size:0.75rem;"> pts</span>
+                        </div>
+                    </div>
+                    rnk++;
+                }
+            </div>
+        }
+    }
 
-    <p class="text-xs" style="color: var(--pb-muted2);">
-        Mock data. Backend will load real results and support export later.
-    </p>
 </section>
 
-@section Scripts {
-    <script>
-        (() => {
-          const params = new URLSearchParams(window.location.search);
-          const type = params.get('type') || 'election';
-          const name = params.get('name') || 'Untitled';
-
-          document.getElementById('resultSubtitle').textContent = `Viewing results for "${decodeURIComponent(name)}"`;
-
-          // ===== ELECTION =====
-          if (type === 'election') {
-            const el = document.getElementById('electionResults');
-            el.style.display = 'block';
-            document.getElementById('electionTitle').textContent = decodeURIComponent(name);
-
-            const candidates = [
-              { name: 'Sara Mohammadi', votes: 87, color: 'var(--pb-gold)' },
-              { name: 'Ali Rezaei', votes: 64, color: 'var(--pb-blue)' },
-              { name: 'Mina Farhadi', votes: 52, color: 'var(--pb-purple)' },
-            ];
-            const total = candidates.reduce((s, c) => s + c.votes, 0);
-            const winner = candidates.reduce((a, b) => a.votes > b.votes ? a : b);
-
-            const barsEl = document.getElementById('electionBars');
-            candidates.forEach((c, i) => {
-              const pct = Math.round((c.votes / total) * 100);
-              const isWinner = c.name === winner.name;
-              barsEl.innerHTML += `
-                <div>
-                  <div style="display:flex; justify-content:space-between; margin-bottom:6px; align-items:baseline;">
-                    <span style="font-weight:600; color:var(--pb-text); font-size:0.95rem;">
-                      ${isWinner ? '👑 ' : ''}${c.name}
-                    </span>
-                    <span style="color:var(--pb-muted2); font-size:0.85rem;">${c.votes} votes · ${pct}%</span>
-                  </div>
-                  <div class="pb-progress">
-                    <div class="pb-progress-fill" style="width:${pct}%; background:${c.color};"></div>
-                  </div>
-                </div>`;
-            });
-
-            document.getElementById('electionTotal').textContent = `Total: ${total} votes`;
-            document.getElementById('electionWinner').textContent = `Winner: ${winner.name}`;
-          }
-
-          // ===== RATING =====
-          if (type === 'rating') {
-            const el = document.getElementById('ratingResults');
-            el.style.display = 'block';
-            document.getElementById('ratingTitle').textContent = decodeURIComponent(name);
-
-            const ratings = [
-              { label: '5 Stars', stars: '★★★★★', count: 42, pct: 42 },
-              { label: '4 Stars', stars: '★★★★☆', count: 31, pct: 31 },
-              { label: '3 Stars', stars: '★★★☆☆', count: 17, pct: 17 },
-              { label: '2 Stars', stars: '★★☆☆☆', count: 7,  pct: 7 },
-              { label: '1 Star',  stars: '★☆☆☆☆', count: 3,  pct: 3 },
-            ];
-            const total = ratings.reduce((s, r) => s + r.count, 0);
-            const avg = ratings.reduce((s, r, i) => s + (5 - i) * r.count, 0) / total;
-
-            document.getElementById('ratingAvg').textContent = avg.toFixed(1);
-            document.getElementById('ratingAvgLabel').textContent = `Average from ${total} responses`;
-
-            const barsEl = document.getElementById('ratingBars');
-            ratings.forEach(r => {
-              barsEl.innerHTML += `
-                <div>
-                  <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.875rem;">
-                    <span style="color:var(--pb-gold);">${r.stars}</span>
-                    <span style="color:var(--pb-muted2);">${r.count} (${r.pct}%)</span>
-                  </div>
-                  <div class="pb-progress">
-                    <div class="pb-progress-fill" style="width:${r.pct}%;"></div>
-                  </div>
-                </div>`;
-            });
-
-            document.getElementById('ratingTotal').textContent = `Total: ${total} responses`;
-          }
-
-          // ===== TEXT =====
-          if (type === 'text') {
-            const el = document.getElementById('textResults');
-            el.style.display = 'block';
-            document.getElementById('textTitle').textContent = decodeURIComponent(name);
-
-            const responses = [
-              { user: 'Mamad S.', time: '2 hours ago', text: 'The event was really well organized. I especially liked the networking session and the panel discussion on AI ethics.' },
-              { user: 'Sara M.', time: '3 hours ago', text: 'Good overall but the venue was too small for the number of attendees. Audio quality could be improved.' },
-              { user: 'Ali R.', time: '5 hours ago', text: 'Excellent speakers and great food. Would definitely attend again next year.' },
-              { user: 'Mina F.', time: '6 hours ago', text: 'I think the schedule was too packed. Breaks between sessions would help.' },
-              { user: 'Reza K.', time: '1 day ago', text: 'Best university event I have been to. The student council did an amazing job putting this together.' },
-              { user: 'Nazanin T.', time: '1 day ago', text: 'More hands-on workshops would be great for future events.' },
-            ];
-
-            document.getElementById('textCount').textContent = `${responses.length} responses collected`;
-
-            const listEl = document.getElementById('textList');
-            responses.forEach(r => {
-              listEl.innerHTML += `
-                <div class="pb-card p-5">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-weight:600; color:var(--pb-text); font-size:0.9rem;">${r.user}</span>
-                    <span style="color:var(--pb-muted2); font-size:0.75rem;">${r.time}</span>
-                  </div>
-                  <p style="color:var(--pb-muted); font-size:0.9rem; line-height:1.6; margin:0;">${r.text}</p>
-                </div>`;
-            });
-          }
-
-        })();
-    </script>
-}
+<style>@@keyframes rpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }</style>

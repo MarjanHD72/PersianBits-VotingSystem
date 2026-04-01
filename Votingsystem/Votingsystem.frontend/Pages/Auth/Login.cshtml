@@ -1,75 +1,78 @@
 ﻿@page
 @model Votingsystem.frontend.Pages.Auth.LoginModel
 @{
-    ViewData["Title"] = "Sign in";
+    ViewData["Title"] = "Sign In";
 }
 
-@*
-  LOGIN
-*@
+<section class="min-h-[80vh] flex items-center justify-center px-4">
+    <div class="w-full max-w-md space-y-6">
 
-<section class="max-w-xl mx-auto space-y-6">
-    <div class="text-center">
-        <h1 class="text-3xl font-semibold">PersianBits Voting System</h1>
-        <p class="text-slate-400 mt-2">Sign in to continue</p>
-    </div>
+        <!-- Brand header -->
+        <div class="flex flex-col items-center gap-4 text-center">
+            <div class="pb-hero-logo" style="width:80px;height:80px;">
+                <img src="~/assets/logo.jpg" alt="PersianBits logo" />
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Welcome back</h1>
+                <p style="color:var(--pb-muted);font-size:0.88rem;margin-top:4px;">Sign in to PersianBits Voting Centre</p>
+            </div>
+        </div>
 
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 space-y-5">
+        <!-- Form card -->
+        <div class="pb-card p-7 space-y-5">
+            <form method="post" class="space-y-5">
 
-        <label class="block">
-            <span class="text-sm text-slate-300">Email</span>
-                   placeholder="name@example.com" />
-        </label>
+                <div class="space-y-1">
+                    <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.05em;text-transform:uppercase;">
+                        Email Address
+                    </label>
+                    <input name="Email" type="email" value="@Model.Email"
+                           class="w-full px-4 py-3 rounded-xl"
+                           placeholder="name@example.com"
+                           autocomplete="email" />
+                </div>
 
-        <label class="block">
-            <span class="text-sm text-slate-300">Password</span>
-                   class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                   placeholder="••••••••" />
-        </label>
+                <div class="space-y-1">
+                    <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.05em;text-transform:uppercase;">
+                        Password
+                    </label>
+                    <input name="Password" type="password"
+                           class="w-full px-4 py-3 rounded-xl"
+                           placeholder="••••••••"
+                           autocomplete="current-password" />
+                </div>
 
-        @* TEMP buttons just to test the routing flow *@
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <a asp-page="/Admin/Dashboard"
-               class="px-4 py-3 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-medium text-center">
-                Sign in as Admin
-            </a>
+                @if (!string.IsNullOrEmpty(Model.Error))
+                {
+                    <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-radius:12px;
+                                background:var(--pb-dangerBg);border:1px solid var(--pb-dangerBdr);">
+                        <span style="font-size:1rem;flex-shrink:0;">⚠️</span>
+                        <p style="color:var(--pb-danger);font-size:0.875rem;margin:0;">@Model.Error</p>
+                    </div>
+                }
 
+                <button type="submit" class="w-full pb-btn pb-btn-gold" style="padding:0.75rem;font-size:0.95rem;">
+                    Sign In
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+
+                <div style="border-top:1px solid var(--pb-border2);padding-top:16px;text-align:center;">
+                    <a asp-page="/Auth/Register/Index" style="color:var(--pb-gold);font-size:0.875rem;text-decoration:none;font-weight:600;">
+                        Don't have an account? <span style="text-decoration:underline;">Create one</span>
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Dev credentials hint -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;
+                    background:var(--pb-warningBg);border:1px solid var(--pb-warningBdr);">
+            <span style="font-size:0.9rem;flex-shrink:0;">🔧</span>
+            <p style="font-size:0.75rem;color:var(--pb-warning);margin:0;line-height:1.5;">
+                <strong>Dev default:</strong> admin@persianbits.com / admin123
+            </p>
         </div>
 
     </div>
 </section>
-
-@section Scripts {
-    <script>
-        (() => {
-          const $ = (id) => document.getElementById(id);
-
-          const handleLogin = (asAdmin) => {
-            const email = $("loginEmail").value.trim();
-            const pass = $("loginPass").value;
-
-            const err = $("loginError");
-            err.classList.add("hidden");
-            err.textContent = "";
-
-            if (!email) { err.textContent = "Enter your email."; err.classList.remove("hidden"); return; }
-            if (!pass)  { err.textContent = "Enter your password."; err.classList.remove("hidden"); return; }
-
-            localStorage.setItem("pb_isLoggedIn", "true");
-            localStorage.setItem("pb_userEmail", email);
-            localStorage.setItem("pb_isApprovedCreator", asAdmin ? "true" : "false");
-
-            const pending = localStorage.getItem("pb_pendingSession");
-            if (pending) {
-              window.location.href = `/Poll/Take?session=${encodeURIComponent(pending)}`;
-              return;
-            }
-
-            window.location.href = asAdmin ? "/Admin/Dashboard" : "/User/Dashboard";
-          };
-
-          $("loginUserBtn").addEventListener("click", () => handleLogin(false));
-          $("loginAdminBtn").addEventListener("click", () => handleLogin(true));
-        })();
-    </script>
-}
