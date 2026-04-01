@@ -1,120 +1,151 @@
 ﻿@page
-@model IndexModel
+@model Votingsystem.frontend.Pages.IndexModel
 @{
     ViewData["Title"] = "PersianBits Voting Centre";
 }
 
-@*
-  LANDING PAGE (PUBLIC)
-  - Join via Session ID (main action)
-  - Login / Register
-  - Frontend-only session flow:
-      If not logged in -> store pending session -> redirect login
-      If logged in -> go straight to Poll/Take?session=...
-*@
+<style>
+    .hero-step {
+        display: flex; flex-direction: column; align-items: center; text-align: center;
+        gap: 5px; flex: 1; min-width: 0;
+    }
+    .hero-step-icon {
+        width: 34px; height: 34px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+        background: var(--pb-goldSubtle); border: 1px solid var(--pb-goldBorder);
+        flex-shrink: 0;
+    }
+    .hero-step-connector {
+        width: 32px; height: 1px;
+        background: linear-gradient(90deg, var(--pb-goldBorder), transparent);
+        flex-shrink: 0; align-self: center; margin-top: -14px;
+    }
+    @@media (max-width: 640px) { .hero-step-connector { display: none; } }
+    .auth-card {
+        display: flex; align-items: center; gap: 12px;
+        padding: 15px 18px; border-radius: 18px; text-decoration: none;
+        background: var(--pb-glass); border: 1px solid var(--pb-border);
+        backdrop-filter: blur(12px); transition: all 0.2s ease;
+        color: var(--pb-text);
+    }
+    .auth-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--pb-shadowGlow);
+        border-color: var(--pb-goldBorder);
+    }
+    .auth-card-icon {
+        width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+</style>
 
-<section class="min-h-[70vh] flex items-center justify-center">
-    <div class="w-full max-w-xl text-center space-y-8">
+<section class="flex flex-col items-center justify-center gap-4 pb-4" style="min-height:calc(100vh - 64px);">
 
-        <!-- Title -->
-        <div class="space-y-6 flex flex-col items-center">
-
-            <!-- Large Logo -->
-            <div class="pb-hero-logo">
-                <img src="~/assets/logo.jpg" alt="PersianBits logo" />
-            </div>
-
-            <!-- Title -->
-            <div class="space-y-3 text-center">
-                <h1 class="text-4xl sm:text-5xl font-semibold tracking-tight">
-                    PersianBits Voting Centre
-                </h1>
-                <p class="text-slate-400">
-                    Secure. Modern. Transparent Elections.
-                </p>
-            </div>
-
+    <!-- ── Hero ─────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col items-center text-center gap-2 max-w-2xl w-full">
+        <div class="pb-hero-logo" style="transform:scale(0.75);margin:-8px 0;">
+            <img src="~/assets/logo.jpg" alt="PersianBits logo" />
         </div>
+        <div class="space-y-1">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight" style="color:var(--pb-text);line-height:1.15;">
+                PersianBits
+                <span style="background:linear-gradient(135deg,var(--pb-gold),var(--pb-goldGlow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                    Voting Centre
+                </span>
+            </h1>
+            <p style="color:var(--pb-muted);font-size:0.9rem;">
+                Secure &middot; Modern &middot; Transparent Elections
+            </p>
+        </div>
+    </div>
 
-        <!-- JOIN via session -->
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-3 text-left">
-            <p class="text-sm text-slate-300 font-medium">Join an election / poll</p>
+    <!-- ── How it works ──────────────────────────────────────────────────── -->
+    <div class="w-full max-w-2xl">
+        <p style="text-align:center;font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--pb-muted2);margin-bottom:8px;">
+            How it works
+        </p>
+        <div style="display:flex;align-items:flex-start;flex-wrap:wrap;justify-content:center;gap:6px;">
+            <div class="hero-step">
+                <div class="hero-step-icon">🔑</div>
+                <p style="font-size:0.75rem;font-weight:700;color:var(--pb-text);">Get Session ID</p>
+                <p style="font-size:0.68rem;color:var(--pb-muted2);line-height:1.3;">Ask the admin for the session code</p>
+            </div>
+            <div class="hero-step-connector"></div>
+            <div class="hero-step">
+                <div class="hero-step-icon">✍️</div>
+                <p style="font-size:0.75rem;font-weight:700;color:var(--pb-text);">Sign In & Vote</p>
+                <p style="font-size:0.68rem;color:var(--pb-muted2);line-height:1.3;">Login and submit your vote securely</p>
+            </div>
+            <div class="hero-step-connector" style="background:linear-gradient(90deg,transparent,var(--pb-goldBorder));"></div>
+            <div class="hero-step">
+                <div class="hero-step-icon">📊</div>
+                <p style="font-size:0.75rem;font-weight:700;color:var(--pb-text);">See Results</p>
+                <p style="font-size:0.68rem;color:var(--pb-muted2);line-height:1.3;">Results update in real time</p>
+            </div>
+        </div>
+    </div>
 
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input id="sessionInput"
-                       class="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-800
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                       placeholder="Enter Session ID (e.g. 7F2A-19KD)" />
-
-                <button id="joinBtn" type="button"
-                        class="px-5 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#FFC94A] text-slate-950 font-semibold
-                               shadow-[0_0_30px_rgba(99,102,241,0.35)] transition">
+    <!-- ── Session join ──────────────────────────────────────────────────── -->
+    <div class="w-full max-w-xl">
+        <div class="pb-card p-5 space-y-3">
+            <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:32px;height:32px;border-radius:10px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🗳️</div>
+                <div>
+                    <p style="font-weight:700;color:var(--pb-text);font-size:0.88rem;">Have a Session ID?</p>
+                    <p style="font-size:0.7rem;color:var(--pb-muted2);">Join an election or poll directly</p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input id="sessionInput" class="flex-1 px-3 py-2 rounded-xl"
+                       placeholder="Enter Session ID  e.g. 7F2A-19KD" style="font-size:0.88rem;" />
+                <button id="joinBtn" type="button" class="pb-btn pb-btn-gold">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     Join
                 </button>
             </div>
-
-            <p id="joinError" class="hidden text-sm text-rose-300"></p>
-
-            <p class="text-xs text-slate-500">
-                If you’re not logged in, you’ll be asked to sign in first, then we’ll take you back into the session.
+            <p id="joinError" style="display:none;color:var(--pb-danger);font-size:0.82rem;"></p>
+            <p style="font-size:0.68rem;color:var(--pb-muted2);">
+                If you're not signed in, you'll be prompted to log in first.
             </p>
         </div>
-
-        <!-- Actions -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <!-- LOGIN -->
-            <a asp-page="/Auth/Login"
-               class="block px-5 py-4 rounded-2xl border border-slate-800 hover:bg-slate-800/40 font-semibold transition">
-                Login
-            </a>
-
-            <!-- CREATE ACCOUNT -->
-            <a asp-page="/Auth/Register/Index"
-               class="block px-5 py-4 rounded-2xl border border-slate-800 hover:bg-slate-800/40 font-semibold transition">
-                Create account
-            </a>
-
-        </div>
-
-        <p class="text-s text-slate-500">
-            Mamad havasesh be shoma hast.
-        </p>
-
     </div>
+
+    <!-- ── Auth cards ────────────────────────────────────────────────────── -->
+    <div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <a asp-page="/Auth/Login" class="auth-card">
+            <div class="auth-card-icon" style="background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);">🔓</div>
+            <div style="flex:1;min-width:0;">
+                <p style="font-weight:700;font-size:0.88rem;">Sign In</p>
+                <p style="font-size:0.7rem;color:var(--pb-muted2);margin-top:1px;">Access your account</p>
+            </div>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a asp-page="/Auth/Register/Index" class="auth-card">
+            <div class="auth-card-icon" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);">✨</div>
+            <div style="flex:1;min-width:0;">
+                <p style="font-weight:700;font-size:0.88rem;">Create Account</p>
+                <p style="font-size:0.7rem;color:var(--pb-muted2);margin-top:1px;">Register to participate</p>
+            </div>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+
 </section>
 
 @section Scripts {
     <script>
         (() => {
-          const input = document.getElementById("sessionInput");
-          const btn = document.getElementById("joinBtn");
-          const err = document.getElementById("joinError");
-
-          const isLoggedIn = () => localStorage.getItem("pb_isLoggedIn") === "true";
-
-          btn.addEventListener("click", () => {
-            err.classList.add("hidden");
-            err.textContent = "";
-
-            const session = (input.value || "").trim();
-            if (!session) {
-              err.textContent = "Please enter a Session ID.";
-              err.classList.remove("hidden");
-              return;
-            }
-
-            // store pending session so login/register can continue the flow
-            localStorage.setItem("pb_pendingSession", session);
-
-            if (!isLoggedIn()) {
-              window.location.href = "/Auth/Login";
-              return;
-            }
-
-            // already logged in -> go directly
-            window.location.href = `/Poll/Take?session=${encodeURIComponent(session)}`;
-          });
+            const btn   = document.getElementById('joinBtn');
+            const input = document.getElementById('sessionInput');
+            const err   = document.getElementById('joinError');
+            btn.addEventListener('click', () => {
+                const s = (input.value || '').trim();
+                if (!s) { err.textContent = 'Please enter a Session ID.'; err.style.display = 'block'; return; }
+                err.style.display = 'none';
+                window.location.href = '/Poll/Take?session=' + encodeURIComponent(s);
+            });
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
         })();
     </script>
 }

@@ -1,109 +1,150 @@
 ﻿@page
 @model Votingsystem.frontend.Pages.Auth.Register.IndexModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create Account";
 }
 
-@*
- REGISTRATION PAGE
-  Fields:
-  - Full name
-  - Date of birth (18+ validation)
-  - Email
-  - Password + Confirm
-  - request creator/admin access
+<section class="min-h-[80vh] flex items-center justify-center px-4 py-10">
+    <div class="w-full max-w-lg space-y-6">
 
-  After register:
-  - pb_isLoggedIn = true
-  - pb_isApprovedCreator = false
-  - pb_requestedCreator = true/false
-  - If pb_pendingSession exists -> go to Poll/Take?session=...
-  - Else -> User Dashboard
-*@
-
-<section class="min-h-[70vh] flex items-center justify-center">
-
-        <div class="text-center space-y-2">
-            <h1 class="text-3xl font-semibold">Create your account</h1>
-        </div>
-
-
-
-
-
-                </span>
-
-
-                    Already have an account? Login
-                </a>
+        <!-- Brand header -->
+        <div class="flex flex-col items-center gap-4 text-center">
+            <div class="pb-hero-logo" style="width:72px;height:72px;">
+                <img src="~/assets/logo.jpg" alt="PersianBits logo" />
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Create your account</h1>
+                <p style="color:var(--pb-muted);font-size:0.88rem;margin-top:4px;">Join PersianBits Voting Centre</p>
             </div>
         </div>
 
-        <p class="text-xs text-slate-500 text-center">
-            Prototype: backend will store accounts and process creator approval.
-        </p>
+        <div class="pb-card p-7">
+            <form method="post" class="space-y-0">
+
+                <!-- Section: Personal Info -->
+                <div style="margin-bottom:6px;">
+                    <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);margin-bottom:16px;">
+                        Personal Information
+                    </p>
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Full Name</label>
+                            <input name="FullName" value="@Model.FullName"
+                                   class="w-full px-4 py-3 rounded-xl"
+                                   placeholder="e.g. Mohammad Saberi"
+                                   autocomplete="name" />
+                        </div>
+
+                        <div class="space-y-1">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Date of Birth</label>
+                            <input name="DateOfBirth" type="date" value="@Model.DateOfBirth"
+                                   class="w-full px-4 py-3 rounded-xl" />
+                            <p style="font-size:0.72rem;color:var(--pb-muted2);margin-top:4px;">You must be 18 or older to participate.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height:1px;background:var(--pb-border2);margin:22px 0;"></div>
+
+                <!-- Section: Account Credentials -->
+                <div style="margin-bottom:6px;">
+                    <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);margin-bottom:16px;">
+                        Account Credentials
+                    </p>
+                    <div class="space-y-4">
+                        <div class="space-y-1">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Email Address</label>
+                            <input name="Email" type="email" value="@Model.Email"
+                                   class="w-full px-4 py-3 rounded-xl"
+                                   placeholder="name@example.com"
+                                   autocomplete="email" />
+                        </div>
+
+                        <div class="space-y-1">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Password</label>
+                            <input name="Password" type="password"
+                                   class="w-full px-4 py-3 rounded-xl"
+                                   placeholder="••••••••"
+                                   autocomplete="new-password" />
+                            <p style="font-size:0.72rem;color:var(--pb-muted2);margin-top:4px;">Minimum 8 characters.</p>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Confirm Password</label>
+                            <input name="Password2" type="password"
+                                   class="w-full px-4 py-3 rounded-xl"
+                                   placeholder="••••••••"
+                                   autocomplete="new-password" />
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height:1px;background:var(--pb-border2);margin:22px 0;"></div>
+
+                <!-- Section: Admin access request -->
+                <div>
+                    <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);margin-bottom:16px;">
+                        Admin / Creator Access
+                    </p>
+                    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;padding:14px;border-radius:14px;
+                                  background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);transition:all 0.2s ease;">
+                        <input type="checkbox" name="RequestAdmin" value="true" id="reqAdminCheck"
+                               @(Model.RequestAdmin ? "checked" : "")
+                               style="width:20px;height:20px;accent-color:var(--pb-gold);flex-shrink:0;margin-top:1px;" />
+                        <div>
+                            <p style="font-size:0.9rem;font-weight:600;color:var(--pb-text);">Request admin / creator access</p>
+                            <p style="font-size:0.77rem;color:var(--pb-muted2);margin-top:3px;line-height:1.5;">
+                                Allows you to create and manage elections. Your request will be reviewed.
+                            </p>
+                        </div>
+                    </label>
+
+                    <div id="adminReasonBlock"
+                         style="display:@(Model.RequestAdmin ? "block" : "none");margin-top:14px;overflow:hidden;transition:all 0.3s ease;">
+                        <div class="space-y-1">
+                            <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">
+                                Why do you need admin access?
+                            </label>
+                            <textarea name="AdminReason" rows="3"
+                                      class="w-full px-4 py-3 rounded-xl"
+                                      placeholder="e.g. I'm a course leader and need to create elections for my students…">@Model.AdminReason</textarea>
+                            <p style="font-size:0.72rem;color:var(--pb-muted2);margin-top:4px;">
+                                Your request will be reviewed by the development team.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Error))
+                {
+                    <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-radius:12px;margin-top:20px;
+                                background:var(--pb-dangerBg);border:1px solid var(--pb-dangerBdr);">
+                        <span style="font-size:1rem;flex-shrink:0;">⚠️</span>
+                        <p style="color:var(--pb-danger);font-size:0.875rem;margin:0;">@Model.Error</p>
+                    </div>
+                }
+
+                <button type="submit" class="w-full pb-btn pb-btn-gold" style="padding:0.75rem;font-size:0.95rem;margin-top:22px;">
+                    Create Account
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+
+                <div style="border-top:1px solid var(--pb-border2);padding-top:16px;text-align:center;margin-top:16px;">
+                    <a asp-page="/Auth/Login" style="color:var(--pb-gold);font-size:0.875rem;text-decoration:none;font-weight:600;">
+                        Already have an account? <span style="text-decoration:underline;">Sign in</span>
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
     </div>
 </section>
 
 @section Scripts {
     <script>
-        (() => {
-          const $ = (id) => document.getElementById(id);
-
-          const yearsAgo = (n) => {
-            const d = new Date();
-            d.setFullYear(d.getFullYear() - n);
-            return d;
-          };
-
-          $("regBtn").addEventListener("click", () => {
-            const name = $("regName").value.trim();
-            const dobRaw = $("regDob").value;
-            const email = $("regEmail").value.trim();
-            const p1 = $("regPass").value;
-            const p2 = $("regPass2").value;
-            const wantsCreator = $("reqCreator").checked;
-
-            const err = $("regError");
-            err.classList.add("hidden");
-            err.textContent = "";
-
-            if (!name) { err.textContent = "Enter your full name."; err.classList.remove("hidden"); return; }
-            if (!dobRaw) { err.textContent = "Select your date of birth."; err.classList.remove("hidden"); return; }
-
-            const dob = new Date(dobRaw + "T00:00:00");
-            if (isNaN(dob.getTime())) { err.textContent = "Invalid date of birth."; err.classList.remove("hidden"); return; }
-
-            // 18+ rule
-            if (dob > yearsAgo(18)) {
-              err.textContent = "You must be 18+ to register.";
-              err.classList.remove("hidden");
-              return;
-            }
-
-            if (!email) { err.textContent = "Enter an email."; err.classList.remove("hidden"); return; }
-            if (!p1 || p1.length < 8) { err.textContent = "Password must be at least 8 characters."; err.classList.remove("hidden"); return; }
-            if (p1 !== p2) { err.textContent = "Passwords do not match."; err.classList.remove("hidden"); return; }
-
-            //  auth state
-            localStorage.setItem("pb_isLoggedIn", "true");
-            localStorage.setItem("pb_isApprovedCreator", "false"); // approval is manual 
-            localStorage.setItem("pb_requestedCreator", wantsCreator ? "true" : "false");
-
-            // Store profile basics 
-            localStorage.setItem("pb_userName", name);
-            localStorage.setItem("pb_userDob", dobRaw);
-            localStorage.setItem("pb_userEmail", email);
-
-            // Continue pending session if exists
-            const pending = localStorage.getItem("pb_pendingSession");
-            if (pending) {
-              window.location.href = `/Poll/Take?session=${encodeURIComponent(pending)}`;
-              return;
-            }
-
-            window.location.href = "/User/Dashboard";
-          });
-        })();
+        document.getElementById('reqAdminCheck')?.addEventListener('change', function () {
+            document.getElementById('adminReasonBlock').style.display = this.checked ? 'block' : 'none';
+        });
     </script>
 }
