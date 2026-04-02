@@ -2,71 +2,105 @@
 @model Votingsystem.frontend.Pages.Admin.Builders.ElectionModel
 @{ ViewData["Title"] = "Election Builder"; }
 
-<section class="max-w-5xl mx-auto space-y-8 px-4">
-    <div class="flex items-start justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-semibold" style="color: var(--pb-text);">Election Builder</h1>
-            <p style="color: var(--pb-muted);">Create candidates with photo and description.</p>
+<section class="max-w-5xl mx-auto space-y-6 px-2 sm:px-4">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                        display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🗳️</div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Election Builder</h1>
+                <p style="color:var(--pb-muted);font-size:0.85rem;margin-top:2px;">Add candidates with photos and descriptions</p>
+            </div>
         </div>
-        <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline">Back</a>
+        <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back
+        </a>
     </div>
 
-    <form method="post" enctype="multipart/form-data" id="electionForm">
-        <div class="pb-card p-6 space-y-4">
-            <h2 class="text-lg font-semibold" style="color: var(--pb-text);">Election Details</h2>
-            <div class="space-y-2">
-                <label class="text-sm" style="color: var(--pb-muted);">Election Title</label>
-                <input name="Title" value="@Model.Title" placeholder="e.g. Student President 2026" class="w-full px-4 py-3 rounded-xl" />
+    <form method="post" enctype="multipart/form-data" id="electionForm" class="space-y-6">
+
+        <!-- Election details -->
+        <div class="pb-card p-6 space-y-5">
+            <h2 style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);">Election Details</h2>
+            <div class="space-y-1">
+                <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Title</label>
+                <input name="Title" value="@Model.Title"
+                       placeholder="e.g. Student President 2026"
+                       class="w-full px-4 py-3 rounded-xl" />
             </div>
-            <div class="space-y-2">
-                <label class="text-sm" style="color: var(--pb-muted);">Description</label>
-                <textarea name="Description" rows="3" placeholder="Short description..." class="w-full px-4 py-3 rounded-xl">@Model.Description</textarea>
+            <div class="space-y-1">
+                <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Description <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                <textarea name="Description" rows="3"
+                          placeholder="Brief description for voters…"
+                          class="w-full px-4 py-3 rounded-xl">@Model.Description</textarea>
             </div>
         </div>
 
-        <div class="pb-card p-6 space-y-6 mt-6">
-            <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold" style="color: var(--pb-text);">Candidates</h2>
-                <button type="button" id="addCandidate" class="pb-btn pb-btn-gold text-sm">+ Add Candidate</button>
+        <!-- Candidates -->
+        <div class="pb-card p-6 space-y-6">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <h2 style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);">Candidates</h2>
+                <button type="button" id="addCandidate" class="pb-btn pb-btn-gold text-sm" style="padding:0.45rem 1rem;">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    Add Candidate
+                </button>
             </div>
-            <div id="candidateList" class="space-y-6"></div>
+            <div id="candidateList" class="space-y-4"></div>
+            <p style="font-size:0.78rem;color:var(--pb-muted2);">At least one candidate required.</p>
         </div>
 
-        <div class="flex justify-end mt-6">
-            <button type="submit" class="pb-btn pb-btn-gold px-8 py-3">Save Election</button>
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline">Cancel</a>
+            <button type="submit" class="pb-btn pb-btn-gold" style="padding:0.7rem 2rem;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                Save Election
+            </button>
         </div>
+
     </form>
 </section>
 
 @section Scripts {
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const list = document.getElementById('candidateList');
+        const list   = document.getElementById('candidateList');
         const addBtn = document.getElementById('addCandidate');
         let count = 0;
 
         function addCard() {
             const i = count++;
             const div = document.createElement('div');
-            div.className = 'pb-card-flat p-5 space-y-4';
+            div.className = 'pb-card-flat';
+            div.style.padding = '20px';
             div.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <h3 class="font-semibold" style="color: var(--pb-text);">Candidate ${i + 1}</h3>
-                    <button type="button" class="remove-btn" style="color: var(--pb-danger); font-size: 0.875rem; cursor: pointer; background:none; border:none;">Remove</button>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div style="width:28px;height:28px;border-radius:8px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                    display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;color:var(--pb-gold);">${i + 1}</div>
+                        <span style="font-weight:700;color:var(--pb-text);font-size:0.95rem;">Candidate ${i + 1}</span>
+                    </div>
+                    <button type="button" class="remove-btn pb-btn pb-btn-danger-outline text-sm" style="padding:0.3rem 0.7rem;">Remove</button>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-sm" style="color: var(--pb-muted);">Full Name</label>
-                    <input name="CandidateList[${i}].Name" class="w-full px-4 py-3 rounded-xl" placeholder="Candidate name" />
-                </div>
-                <div class="space-y-2">
-                    <label class="text-sm" style="color: var(--pb-muted);">Photo</label>
-                    <input type="file" name="CandidateImage_${i}" accept="image/*"
-                           class="w-full px-4 py-3 rounded-xl" style="background: var(--pb-inputBg); border: 1px solid var(--pb-inputBorder); color: var(--pb-text);" />
-                    <span class="text-xs" style="color: var(--pb-muted2);">Upload from your device. JPG, PNG supported.</span>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-sm" style="color: var(--pb-muted);">Description</label>
-                    <textarea name="CandidateList[${i}].Description" rows="3" class="w-full px-4 py-3 rounded-xl" placeholder="Background, goals..."></textarea>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label style="font-size:0.78rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Full Name</label>
+                        <input name="CandidateList[${i}].Name" class="w-full px-4 py-3 rounded-xl" placeholder="Candidate name" />
+                    </div>
+                    <div class="space-y-1">
+                        <label style="font-size:0.78rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Photo</label>
+                        <input type="file" name="CandidateImage_${i}" accept="image/*"
+                               class="w-full px-4 py-3 rounded-xl"
+                               style="background:var(--pb-inputBg);border:1px solid var(--pb-inputBorder);color:var(--pb-text);" />
+                        <p style="font-size:0.72rem;color:var(--pb-muted2);">JPG or PNG, recommended 400×400px</p>
+                    </div>
+                    <div class="space-y-1">
+                        <label style="font-size:0.78rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Description</label>
+                        <textarea name="CandidateList[${i}].Description" rows="3" class="w-full px-4 py-3 rounded-xl"
+                                  placeholder="Background, goals, platform…"></textarea>
+                    </div>
                 </div>
             `;
             div.querySelector('.remove-btn').addEventListener('click', () => div.remove());

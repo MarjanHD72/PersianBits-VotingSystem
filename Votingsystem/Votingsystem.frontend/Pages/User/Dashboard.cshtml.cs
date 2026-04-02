@@ -13,16 +13,18 @@ public class DashboardModel : PageModel
     public DashboardModel(AppDbContext db) => _db = db;
 
     public List<Election> AvailableElections { get; set; } = new();
+    public int VotesCount { get; set; }
 
     public async Task OnGetAsync()
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        // Show running elections the user hasn't voted in yet
         var votedIds = await _db.Votes
             .Where(v => v.UserId == userId)
             .Select(v => v.ElectionId)
             .ToListAsync();
+
+        VotesCount = votedIds.Count;
 
         AvailableElections = await _db.Elections
             .Where(e => e.Status == "running" && !votedIds.Contains(e.Id))

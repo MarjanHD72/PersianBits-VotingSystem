@@ -1,0 +1,86 @@
+@page
+@model Votingsystem.frontend.Pages.Admin.Builders.MultichoiceModel
+@{ ViewData["Title"] = "Multichoice Builder"; }
+
+<section class="max-w-3xl mx-auto space-y-6 px-2 sm:px-4">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:42px;height:42px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                        display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">☑️</div>
+            <div>
+                <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Multichoice Builder</h1>
+                <p style="color:var(--pb-muted);font-size:0.85rem;margin-top:2px;">Users select one or more options</p>
+            </div>
+        </div>
+        <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back
+        </a>
+    </div>
+
+    <form method="post" class="space-y-6">
+
+        <div class="pb-card p-6 space-y-5">
+            <h2 style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);">Question Details</h2>
+            <div class="space-y-1">
+                <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">Title</label>
+                <input name="Title" value="@Model.Title"
+                       class="w-full px-4 py-3 rounded-xl"
+                       placeholder="e.g. Which modules would you like to take?" />
+            </div>
+            <div class="space-y-1">
+                <label style="font-size:0.8rem;font-weight:600;color:var(--pb-muted2);letter-spacing:0.04em;text-transform:uppercase;">
+                    Description <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span>
+                </label>
+                <textarea name="Description" rows="2" class="w-full px-4 py-3 rounded-xl"
+                          placeholder="Optional description">@Model.Description</textarea>
+            </div>
+        </div>
+
+        <div class="pb-card p-6 space-y-4">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <h2 style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);">Options</h2>
+                <button type="button" id="addOpt" class="pb-btn pb-btn-gold text-sm" style="padding:0.45rem 1rem;">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    Add Option
+                </button>
+            </div>
+            <div id="optList" class="space-y-3"></div>
+            <p style="font-size:0.78rem;color:var(--pb-muted2);">At least two options required.</p>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+            <a asp-page="/Admin/CreatePoll" class="pb-btn pb-btn-outline">Cancel</a>
+            <button type="submit" class="pb-btn pb-btn-gold" style="padding:0.7rem 2rem;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                Save
+            </button>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+<script>
+    let c = 0;
+    const list = document.getElementById('optList');
+    function add() {
+        const i = c++;
+        const d = document.createElement('div');
+        d.style.cssText = 'display:flex;gap:8px;align-items:center;';
+        d.innerHTML = `
+            <span style="width:26px;height:26px;border-radius:8px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                         display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:var(--pb-gold);flex-shrink:0;">${i+1}</span>
+            <input name="OptionList[${i}]" class="flex-1 px-4 py-3 rounded-xl" placeholder="Option ${i+1}" />
+            <button type="button" onclick="this.parentElement.remove()"
+                    class="pb-btn pb-btn-danger-outline text-sm" style="padding:0.45rem 0.7rem;flex-shrink:0;">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        `;
+        list.appendChild(d);
+    }
+    document.getElementById('addOpt').addEventListener('click', add);
+    add(); add();
+</script>
+}

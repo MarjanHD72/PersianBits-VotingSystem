@@ -1,61 +1,295 @@
 ﻿@page
 @model Votingsystem.frontend.Pages.Poll.TakeModel
 @{
+    ViewData["Title"] = Model.Election?.Title ?? "Vote";
+    var session = HttpContext.Request.Query["session"].ToString();
 }
 
-@*
-*@
+<style>
+    /* Candidate card selection */
+    .candidate-label input[type="radio"]:checked + .candidate-card {
+        border-color: var(--pb-gold) !important;
+        box-shadow: 0 0 0 2px rgba(212,175,55,0.30), var(--pb-shadowGlow);
+    }
+    .candidate-label input[type="radio"]:checked + .candidate-card .candidate-check {
+        opacity: 1; transform: scale(1);
+    }
+    /* Rating star selection */
+    .star-label input[type="radio"]:checked + .star-btn {
+        background: linear-gradient(135deg, var(--pb-gold), var(--pb-goldGlow)) !important;
+        color: #111 !important;
+        border-color: var(--pb-gold) !important;
+        box-shadow: 0 0 20px rgba(212,175,55,0.35);
+        transform: scale(1.1);
+    }
+    /* Multichoice selection */
+    .mc-label input[type="checkbox"]:checked + .mc-row {
+        background: var(--pb-goldSubtle) !important;
+        border-color: var(--pb-goldBorder) !important;
+    }
+    .rank-item.dragging { opacity: 0.45; }
+    .rank-item.selected { border-color: var(--pb-gold) !important; box-shadow: 0 0 8px rgba(212,175,55,0.25); }
+</style>
 
+<section class="max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
 
-    <div class="space-y-2">
-    </div>
-
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <!-- Error state -->
+        <div class="pb-card p-8 text-center space-y-5">
+            <div style="font-size:3rem;">⚠️</div>
+            <div>
+                <h2 class="text-xl font-bold" style="color:var(--pb-text);">Unable to Load Election</h2>
+                <p style="color:var(--pb-danger);font-size:0.95rem;margin-top:8px;">@Model.Error</p>
+            </div>
+            <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline" style="display:inline-flex;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Back to Dashboard
+            </a>
         </div>
+    }
+    else if (Model.AlreadyVoted)
+    {
+        <!-- Already voted state -->
+        <div class="pb-card p-8 text-center space-y-5">
+            <div style="font-size:3rem;">✅</div>
+            <div>
+                <h2 class="text-xl font-bold" style="color:var(--pb-text);">Already Voted</h2>
+                <p style="color:var(--pb-muted);margin-top:8px;">You've already submitted your vote for this election.</p>
+            </div>
+            <a asp-page="/User/Dashboard" class="pb-btn pb-btn-gold" style="display:inline-flex;">Back to Dashboard</a>
+        </div>
+    }
+    else if (Model.Election != null)
+    {
+        <!-- Election header card -->
+        <div class="pb-card p-6">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                        <span class="pb-badge pb-badge-success" style="font-size:0.72rem;">
+                            <span style="width:6px;height:6px;border-radius:50%;background:var(--pb-success);display:inline-block;margin-right:4px;animation:vpulse 1.5s infinite;"></span>
+                            Live
+                        </span>
+                        <span class="pb-badge pb-badge-gold" style="font-size:0.72rem;">@Model.Election.Type.ToUpper()</span>
+                        <span style="font-size:0.75rem;color:var(--pb-muted2);">PersianBits Voting Centre</span>
+                    </div>
+                    <h1 class="text-2xl font-bold" style="color:var(--pb-text);line-height:1.2;">@Model.Election.Title</h1>
+                    @if (!string.IsNullOrEmpty(Model.Election.Description))
+                    {
+                        <p style="color:var(--pb-muted);margin-top:8px;font-size:0.9rem;line-height:1.6;">@Model.Election.Description</p>
+                    }
+                </div>
+                <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Back
+                </a>
+            </div>
         </div>
 
-        <div class="candidate-card cursor-pointer rounded-2xl border border-slate-800 bg-slate-900/40 p-4 hover:bg-slate-900/70 transition"
-             data-name="Mina Farhadi"
-             data-desc="Mina prioritizes student wellbeing, mental health resources, and campus community events."
-             data-img="https://images.unsplash.com/photo-1580489944761-15a19d654956">
-            <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956"
-                 class="w-full h-48 object-cover rounded-xl mb-3" />
-            <h3 class="font-semibold">Mina Farhadi</h3>
-            <p class="text-sm text-slate-400 mt-1">Wellbeing & campus life</p>
-        </div>
+        <!-- Vote form -->
+        <form method="post" id="voteForm">
+            <input type="hidden" name="session" value="@session" />
 
-    <!-- Question 1: Single choice -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Single choice</p>
-            <h2 class="text-lg font-semibold mt-1">How satisfied are you with this module?</h2>
-    </div>
+            @if (Model.Election.Type == "election")
+            {
+                <div>
+                    <p style="font-size:0.82rem;color:var(--pb-muted2);margin-bottom:14px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">
+                        Select one candidate
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach (var c in Model.Election.Candidates)
+                        {
+                            <label class="cursor-pointer candidate-label">
+                                <input type="radio" name="candidateId" value="@c.Id" class="hidden" required />
+                                <div class="candidate-card pb-card p-4 transition" style="position:relative;height:100%;">
+                                    <!-- Selected check -->
+                                    <div class="candidate-check" style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;
+                                                background:var(--pb-gold);display:flex;align-items:center;justify-content:center;
+                                                opacity:0;transform:scale(0.5);transition:all 0.2s ease;">
+                                        <svg width="12" height="12" fill="none" stroke="#111" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(c.ImageUrl))
+                                    {
+                                        <img src="@c.ImageUrl" class="w-full object-cover rounded-xl mb-3"
+                                             style="height:160px;"
+                                             onerror="this.style.display='none'" />
+                                    }
+                                    else
+                                    {
+                                        <div style="height:80px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                                    display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:12px;">👤</div>
+                                    }
+                                    <h3 class="font-bold" style="color:var(--pb-text);font-size:1rem;">@c.Name</h3>
+                                    @if (!string.IsNullOrEmpty(c.Description))
+                                    {
+                                        <p style="font-size:0.82rem;color:var(--pb-muted);margin-top:5px;line-height:1.5;">@c.Description</p>
+                                    }
+                                </div>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.Election.Type == "rating")
+            {
+                <div class="pb-card p-8">
+                    <p style="font-size:0.82rem;color:var(--pb-muted2);margin-bottom:6px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Rate this</p>
+                    <p class="font-bold text-lg" style="color:var(--pb-text);margin-bottom:28px;">@Model.Election.Title</p>
+                    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <label class="cursor-pointer star-label" style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                                <input type="radio" name="ratingValue" value="@i" class="hidden" required />
+                                <div class="star-btn" style="width:64px;height:64px;border-radius:18px;
+                                            display:flex;align-items:center;justify-content:center;
+                                            font-size:1.6rem;transition:all 0.2s ease;
+                                            background:var(--pb-glass2);border:1.5px solid var(--pb-border);">
+                                    @(i == 1 ? "😕" : i == 2 ? "😐" : i == 3 ? "🙂" : i == 4 ? "😊" : "🤩")
+                                </div>
+                                <span style="font-size:0.75rem;font-weight:700;color:var(--pb-muted2);">@i</span>
+                            </label>
+                        }
+                    </div>
+                    <p style="text-align:center;font-size:0.78rem;color:var(--pb-muted2);margin-top:20px;">1 = poor &nbsp; 5 = excellent</p>
+                </div>
+            }
+            else if (Model.Election.Type == "text")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p style="font-size:0.82rem;color:var(--pb-muted2);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Your response</p>
+                    <p class="font-bold text-lg" style="color:var(--pb-text);">@Model.Election.Title</p>
+                    @if (!string.IsNullOrEmpty(Model.Election.Description))
+                    {
+                        <p style="color:var(--pb-muted);font-size:0.88rem;">@Model.Election.Description</p>
+                    }
+                    <textarea name="textResponse" rows="6" class="w-full px-4 py-3 rounded-xl"
+                              placeholder="Write your response here…" required
+                              style="resize:vertical;"></textarea>
+                </div>
+            }
+            else if (Model.Election.Type == "multichoice")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p style="font-size:0.82rem;color:var(--pb-muted2);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Select all that apply</p>
+                    <p class="font-bold text-lg" style="color:var(--pb-text);">@Model.Election.Title</p>
+                    <div class="space-y-3" style="margin-top:4px;">
+                        @foreach (var opt in Model.Election.Options)
+                        {
+                            <label class="mc-label cursor-pointer" style="display:block;">
+                                <input type="checkbox" name="selectedOptions" value="@opt.Id" class="hidden" />
+                                <div class="mc-row" style="display:flex;align-items:center;gap:14px;padding:14px 16px;
+                                            border-radius:14px;background:var(--pb-glass2);border:1.5px solid var(--pb-border);
+                                            transition:all 0.15s ease;">
+                                    <div style="width:22px;height:22px;border-radius:7px;border:2px solid var(--pb-border);
+                                                background:var(--pb-glass2);display:flex;align-items:center;justify-content:center;
+                                                flex-shrink:0;transition:all 0.15s ease;">
+                                        <svg width="12" height="12" fill="none" stroke="var(--pb-gold)" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                    </div>
+                                    <span style="color:var(--pb-text);font-size:0.95rem;">@opt.Text</span>
+                                </div>
+                            </label>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.Election.Type == "ranking")
+            {
+                <div class="pb-card p-6 space-y-4">
+                    <p style="font-size:0.82rem;color:var(--pb-muted2);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Drag to rank — top is best</p>
+                    <p class="font-bold text-lg" style="color:var(--pb-text);">@Model.Election.Title</p>
+                    <input type="hidden" name="rankingOrder" id="rankingOrder" />
+                    <div id="rankList" class="space-y-2" style="margin-top:4px;">
+                        @foreach (var opt in Model.Election.Options)
+                        {
+                            <div class="rank-item" data-id="@opt.Id"
+                                 style="display:flex;align-items:center;gap:12px;padding:14px 16px;
+                                        border-radius:14px;cursor:grab;user-select:none;
+                                        background:var(--pb-glass2);border:1.5px solid var(--pb-border);
+                                        transition:all 0.15s ease;"
+                                 draggable="true">
+                                <span class="rank-num" style="color:var(--pb-gold);font-weight:800;font-size:1rem;min-width:28px;"></span>
+                                <span style="color:var(--pb-text);flex:1;font-size:0.95rem;">@opt.Text</span>
+                                <span style="color:var(--pb-muted2);font-size:1.1rem;cursor:grab;">⠿</span>
+                            </div>
+                        }
+                    </div>
+                    <p style="font-size:0.75rem;color:var(--pb-muted2);">On mobile, tap an item then use the buttons below to reorder.</p>
+                    <div id="rankButtons" class="flex gap-2 sm:hidden">
+                        <button type="button" id="moveUp"   class="pb-btn pb-btn-outline text-sm flex-1">▲ Move Up</button>
+                        <button type="button" id="moveDown" class="pb-btn pb-btn-outline text-sm flex-1">▼ Move Down</button>
+                    </div>
+                </div>
+            }
 
+            <div class="flex justify-end gap-3 mt-6">
+                <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Back
+                </a>
+                <button type="submit" class="pb-btn pb-btn-gold">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    Submit Vote
+                </button>
+            </div>
+        </form>
+    }
 
+</section>
 
-    </div>
-    </div>
+@section Scripts {
+<style>
+    @@keyframes vpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+<script>
+(() => {
+    // ── Drag-and-drop ranking ──────────────────────────────────────────────
+    const rankList = document.getElementById('rankList');
+    if (!rankList) return;
 
+    let dragItem = null;
+    let selectedItem = null;
 
+    function updateOrder() {
+        rankList.querySelectorAll('.rank-item').forEach((el, i) => {
+            el.querySelector('.rank-num').textContent = (i + 1) + '.';
+        });
+        document.getElementById('rankingOrder').value =
+            Array.from(rankList.querySelectorAll('.rank-item')).map(el => el.dataset.id).join(',');
+    }
 
+    rankList.querySelectorAll('.rank-item').forEach(item => {
+        item.addEventListener('dragstart', () => { dragItem = item; item.classList.add('dragging'); });
+        item.addEventListener('dragend',   () => { item.classList.remove('dragging'); updateOrder(); });
+        item.addEventListener('dragover',  e  => e.preventDefault());
+        item.addEventListener('drop', e => {
+            e.preventDefault();
+            if (dragItem && dragItem !== item) {
+                const items = [...rankList.children];
+                items.indexOf(dragItem) < items.indexOf(item) ? item.after(dragItem) : item.before(dragItem);
+            }
+        });
+        item.addEventListener('click', () => {
+            rankList.querySelectorAll('.rank-item').forEach(el => el.classList.remove('selected'));
+            item.classList.add('selected');
+            selectedItem = item;
+        });
+    });
 
+    document.getElementById('moveUp')?.addEventListener('click', () => {
+        if (selectedItem?.previousElementSibling) {
+            selectedItem.previousElementSibling.before(selectedItem);
+            updateOrder();
+        }
+    });
+    document.getElementById('moveDown')?.addEventListener('click', () => {
+        if (selectedItem?.nextElementSibling) {
+            selectedItem.nextElementSibling.after(selectedItem);
+            updateOrder();
+        }
+    });
 
-        </div>
-    </div>
-
-    <!-- Question 3: Open text -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div>
-            <p class="text-xs text-slate-400">Open text</p>
-            <h2 class="text-lg font-semibold mt-1">What should we improve?</h2>
-</div>
-
-
-
-
-
-
-
-
-
-
-
+    updateOrder();
+})();
+</script>
+}
