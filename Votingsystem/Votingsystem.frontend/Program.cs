@@ -95,6 +95,7 @@ app.MapPost("/api/ai/chat", async (HttpContext context) =>
 Conversation so far:
 {conversation}
 
+
 Latest question: {lastUserMessage}
 Answer:";
 
