@@ -63,19 +63,34 @@ app.MapPost("/api/ai/chat", async (HttpContext context) =>
 {
     var request = await context.Request.ReadFromJsonAsync<ChatRequest>();
     var history = request?.History;
-
+   
     if (history == null || history.Count == 0)
-        return Results.BadRequest("No messages");
-
+    {
+        history = new List<Message>
+        {
+            new Message { Role = "user", Content = "Hello" }
+        };
+    }
 // Build conversation string
     var conversation = string.Join("\n", history.Select(m =>
         m.Role == "user" ? $"User: {m.Content}" : $"Assistant: {m.Content}"));
 
     var lastUserMessage = history.LastOrDefault(m => m.Role == "user")?.Content ?? "";
 
-    var prompt = $@"You are an AI assistant for PersianBits Voting System. 
-Keep answers SHORT (max 2 sentences). 
-ONLY answer about the PersianBits Voting System.
+   var prompt = $@"You are a helpful assistant for the PersianBits Voting System.                                                                                                     
+  Keep answers SHORT (2-3 sentences max).                                                                                                                                            
+  ONLY answer questions about how this system works. Politely refuse anything unrelated.                                                                                             
+                                                                                                                                                                                     
+  Here is how the system works:                                                                                                                                                    
+  - Admins register at /Auth/Register and get approved by the super-admin.                                                                                                           
+  - Admins create elections/polls from their Dashboard. Poll types: Election (candidates), Rating Scale, Multiple Choice, Ranking, and Text Response.                                
+  - Each poll gets a unique Session ID in XXXX-XXXX format (e.g. 7F2A-19KD).                                                                                                         
+  - Admins share the Session ID with voters. Voters go to the homepage, enter the Session ID in the join box, and vote.                                                              
+  - Admins can Start (activate), Stop (close), or Delete their polls from the Dashboard.                                                                                             
+  - Users register at /Auth/Register, log in, and can vote in any running poll they have a Session ID for.                                                                           
+  - Each user can only vote once per poll.                                                                                                                                           
+  - After voting, users are redirected to a Thank You page. Results are visible to the admin in real time.                                                                           
+  - The admin dashboard shows KPI stats: total elections, running count, votes today, total votes, total users, and completion rate — plus charts for vote trends and top elections. 
 
 Conversation so far:
 {conversation}
