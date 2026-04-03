@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VotingSystem.Domain;
+using Votingsystem.frontend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,11 +34,12 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Auto-create / migrate DB
+// Auto-create / migrate DB + seed demo data
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+    await DemoSeeder.SeedAsync(db);
 }
 
 // Create uploads folder
