@@ -51,6 +51,11 @@ public class LoginModel : PageModel
         var identity = new ClaimsIdentity(claims, "Cookies");
         await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity));
 
-        return Redirect(user.Role == "Admin" ? "/Admin/Dashboard" : "/User/Dashboard");
+        return Redirect(user.Role switch
+        {
+            "Developer" => "/Developer/Dashboard",
+            "Admin"     => "/Admin/Dashboard",
+            _           => "/User/Dashboard"
+        });
     }
 }

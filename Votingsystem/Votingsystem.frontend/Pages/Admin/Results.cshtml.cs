@@ -21,10 +21,10 @@ public class ResultsModel : PageModel
     public int TotalVotes { get; set; }
     public double AverageRating { get; set; }
 
-    public class CandidateResult { public string Name { get; set; } = ""; public int Votes { get; set; } public double Percentage { get; set; } }
-    public class RatingResult { public int Stars { get; set; } public int Count { get; set; } public double Percentage { get; set; } }
-    public class TextResult { public string UserName { get; set; } = ""; public string Text { get; set; } = ""; public DateTime SubmittedAt { get; set; } }
-    public class OptionResult { public string Text { get; set; } = ""; public int Count { get; set; } public double Percentage { get; set; } }
+    public class CandidateResult { public string Name { get; set; } = ""; public string ImageUrl { get; set; } = ""; public int Votes { get; set; } public double Percentage { get; set; } }
+    public class RatingResult    { public int Stars { get; set; } public int Count { get; set; } public double Percentage { get; set; } }
+    public class TextResult      { public string UserName { get; set; } = ""; public string Text { get; set; } = ""; public DateTime SubmittedAt { get; set; } }
+    public class OptionResult    { public string Text { get; set; } = ""; public int Count { get; set; } public double Percentage { get; set; } }
     public class RankingItemResult { public string Text { get; set; } = ""; public double AvgPosition { get; set; } public int Points { get; set; } }
 
     public async Task<IActionResult> OnGetAsync(int? id)
@@ -41,68 +41,87 @@ public class ResultsModel : PageModel
 
         if (Election.Type == "election")
         {
-            CandidateResults = Election.Candidates
-                .Select(c => new CandidateResult
+            // BEFORE: O(votes × candidates) — Count() called once per candidate
+            // AFTER:  O(votes) — single pass through votes, O(1) slot lookup per vote
+            var tally = VoteTally.ForCandidates(Election.Candidates);
+            foreach (var v in Election.Votes)
+                tally.RecordSingleVote(v.CandidateId);
+
+            CandidateResults = tally.GetRankedResults()
+                .Select(e => new CandidateResult
                 {
-                    Name = c.Name,
-                    Votes = Election.Votes.Count(v => v.CandidateId == c.Id),
-                    Percentage = TotalVotes > 0 ? Math.Round(Election.Votes.Count(v => v.CandidateId == c.Id) * 100.0 / TotalVotes, 1) : 0
-                }).OrderByDescending(c => c.Votes).ToList();
+                    Name       = e.Label,
+                    ImageUrl   = e.ImageUrl,
+                    Votes      = e.Score,
+                    Percentage = e.Percentage
+                }).ToList();
         }
         else if (Election.Type == "rating")
         {
-            for (int i = 5; i >= 1; i--)
-            {
-                var count = Election.Votes.Count(v => v.RatingValue == i);
-                RatingResults.Add(new RatingResult
+            // BEFORE: Count() called once per star level (5 passes) + separate Average()
+            // AFTER:  single pass; WeightedAverage() computed from the same tally
+            var tally = VoteTally.ForRatingScale();
+            foreach (var v in Election.Votes)
+                tally.RecordRating(v.RatingValue);
+
+            AverageRating = tally.WeightedAverage();
+
+            RatingResults = tally.GetRankedResults()
+                .OrderByDescending(e => e.Id)          // display 5★ first
+                .Select(e => new RatingResult
                 {
-                    Stars = i,
-                    Count = count,
-                    Percentage = TotalVotes > 0 ? Math.Round(count * 100.0 / TotalVotes, 1) : 0
-                });
-            }
-            AverageRating = TotalVotes > 0 ? Math.Round(Election.Votes.Where(v => v.RatingValue.HasValue).Average(v => v.RatingValue!.Value), 1) : 0;
+                    Stars      = e.Id,
+                    Count      = e.Score,
+                    Percentage = e.Percentage
+                }).ToList();
         }
         else if (Election.Type == "text")
         {
-            TextResponses = Election.Votes.Where(v => v.TextResponse != null)
+            // Text responses are free-form — no tally needed, kept as-is
+            TextResponses = Election.Votes
+                .Where(v => v.TextResponse != null)
                 .OrderByDescending(v => v.SubmittedAt)
-                .Select(v => new TextResult { UserName = v.User.FullName, Text = v.TextResponse!, SubmittedAt = v.SubmittedAt }).ToList();
+                .Select(v => new TextResult
+                {
+                    UserName    = v.User.FullName,
+                    Text        = v.TextResponse!,
+                    SubmittedAt = v.SubmittedAt
+                }).ToList();
         }
         else if (Election.Type == "multichoice")
         {
-            foreach (var opt in Election.Options)
-            {
-                var count = Election.Votes.Count(v => v.SelectedOptions != null && v.SelectedOptions.Split(',').Contains(opt.Id.ToString()));
-                OptionResults.Add(new OptionResult
+            // BEFORE: O(votes × options) — Count() + Split() called once per option
+            // AFTER:  O(votes × avg_selections) — each vote's CSV parsed exactly once
+            var tally = VoteTally.ForOptions(Election.Options);
+            foreach (var v in Election.Votes)
+                tally.RecordMultiChoice(v.SelectedOptions);
+
+            OptionResults = tally.GetRankedResults()
+                .Select(e => new OptionResult
                 {
-                    Text = opt.Text,
-                    Count = count,
-                    Percentage = TotalVotes > 0 ? Math.Round(count * 100.0 / TotalVotes, 1) : 0
-                });
-            }
-            OptionResults = OptionResults.OrderByDescending(o => o.Count).ToList();
+                    Text       = e.Label,
+                    Count      = e.Score,
+                    Percentage = e.Percentage
+                }).ToList();
         }
         else if (Election.Type == "ranking")
         {
-            var optCount = Election.Options.Count;
-            foreach (var opt in Election.Options)
-            {
-                int totalPoints = 0; int appearances = 0;
-                foreach (var v in Election.Votes.Where(v => !string.IsNullOrEmpty(v.RankingOrder)))
+            // BEFORE: O(votes × options²) — nested loop: per option → per vote → indexOf
+            // AFTER:  O(votes × options)  — each ballot's ranking CSV parsed exactly once;
+            //         Borda points assigned to all slots in that single pass
+            var tally = VoteTally.ForOptions(Election.Options);
+            foreach (var v in Election.Votes)
+                tally.RecordBordaRanking(v.RankingOrder);
+
+            RankingItemResults = tally.GetRankedResults()
+                .Select(e => new RankingItemResult
                 {
-                    var order = v.RankingOrder!.Split(',');
-                    var idx = Array.IndexOf(order, opt.Id.ToString());
-                    if (idx >= 0) { totalPoints += (optCount - idx); appearances++; }
-                }
-                RankingItemResults.Add(new RankingItemResult
-                {
-                    Text = opt.Text,
-                    Points = totalPoints,
-                    AvgPosition = appearances > 0 ? Math.Round((double)totalPoints / appearances, 1) : 0
-                });
-            }
-            RankingItemResults = RankingItemResults.OrderByDescending(r => r.Points).ToList();
+                    Text        = e.Label,
+                    Points      = e.Score,
+                    AvgPosition = tally.BallotCount > 0
+                                      ? Math.Round((double)e.Score / tally.BallotCount, 1)
+                                      : 0
+                }).ToList();
         }
 
         return Page();

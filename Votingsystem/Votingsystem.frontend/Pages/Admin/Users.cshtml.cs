@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,7 +18,20 @@ public class UsersModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var query = _db.Users.AsQueryable();
+        var adminId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var electionIds = await _db.Elections
+            .Where(e => e.CreatorId == adminId)
+            .Select(e => e.Id)
+            .ToListAsync();
+
+        var participantIds = await _db.Votes
+            .Where(v => electionIds.Contains(v.ElectionId))
+            .Select(v => v.UserId)
+            .Distinct()
+            .ToListAsync();
+
+        var query = _db.Users.Where(u => participantIds.Contains(u.Id));
 
         if (!string.IsNullOrWhiteSpace(Search))
         {

@@ -70,5 +70,20 @@ public class AppDbContext : DbContext
             IsActive = true,
             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
         });
+
+        // Seed a default developer
+        mb.Entity<AppUser>().HasData(new AppUser
+        {
+            Id = 2,
+            FullName = "Developer",
+            Email = "dev@persianbits.com",
+            PasswordHash = BCryptHelper.Hash("dev123"),
+            DateOfBirth = new DateTime(2000, 1, 1),
+            Role = "Developer",
+            Avatar = "⚡",
+            IsActive = true,
+            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+        });
+
     }
 }
