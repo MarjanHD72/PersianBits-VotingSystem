@@ -23,8 +23,8 @@
     }
     @@media (max-width: 640px) { .hero-step-connector { display: none; } }
     .auth-card {
-        display: flex; align-items: center; gap: 12px;
-        padding: 15px 18px; border-radius: 18px; text-decoration: none;
+        display: flex; align-items: center; gap: 14px;
+        padding: 20px 24px; border-radius: 18px; text-decoration: none;
         background: var(--pb-glass); border: 1px solid var(--pb-border);
         backdrop-filter: blur(12px); transition: all 0.2s ease;
         color: var(--pb-text);
@@ -35,8 +35,8 @@
         border-color: var(--pb-goldBorder);
     }
     .auth-card-icon {
-        width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+        width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
     }
 </style>
 
@@ -87,47 +87,47 @@
     </div>
 
     <!-- ── Session join ──────────────────────────────────────────────────── -->
-    <div class="w-full max-w-xl">
-        <div class="pb-card p-5 space-y-3">
-            <div style="display:flex;align-items:center;gap:8px;">
-                <div style="width:32px;height:32px;border-radius:10px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🗳️</div>
+    <div class="w-full max-w-2xl">
+        <div class="pb-card p-6 space-y-4">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:44px;height:44px;border-radius:13px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🗳️</div>
                 <div>
-                    <p style="font-weight:700;color:var(--pb-text);font-size:0.88rem;">Have a Session ID?</p>
-                    <p style="font-size:0.7rem;color:var(--pb-muted2);">Join an election or poll directly</p>
+                    <p style="font-weight:700;color:var(--pb-text);font-size:1rem;">Have a Session ID?</p>
+                    <p style="font-size:0.78rem;color:var(--pb-muted2);">Join an election or poll directly</p>
                 </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2">
-                <input id="sessionInput" class="flex-1 px-3 py-2 rounded-xl"
-                       placeholder="Enter Session ID  e.g. 7F2A-19KD" style="font-size:0.88rem;" />
+            <div class="flex flex-col sm:flex-row gap-3">
+                <input id="sessionInput" class="flex-1 px-4 py-3 rounded-xl"
+                       placeholder="Enter Session ID  e.g. 7F2A-19KD" />
                 <button id="joinBtn" type="button" class="pb-btn pb-btn-gold">
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     Join
                 </button>
             </div>
             <p id="joinError" style="display:none;color:var(--pb-danger);font-size:0.82rem;"></p>
-            <p style="font-size:0.68rem;color:var(--pb-muted2);">
+            <p style="font-size:0.75rem;color:var(--pb-muted2);">
                 If you're not signed in, you'll be prompted to log in first.
             </p>
         </div>
     </div>
 
     <!-- ── Auth cards ────────────────────────────────────────────────────── -->
-    <div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-3">
         <a asp-page="/Auth/Login" class="auth-card">
             <div class="auth-card-icon" style="background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);">🔓</div>
             <div style="flex:1;min-width:0;">
-                <p style="font-weight:700;font-size:0.88rem;">Sign In</p>
-                <p style="font-size:0.7rem;color:var(--pb-muted2);margin-top:1px;">Access your account</p>
+                <p style="font-weight:700;font-size:0.95rem;">Sign In</p>
+                <p style="font-size:0.78rem;color:var(--pb-muted2);margin-top:2px;">Access your account</p>
             </div>
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <a asp-page="/Auth/Register/Index" class="auth-card">
             <div class="auth-card-icon" style="background:rgba(52,211,153,0.10);border:1px solid rgba(52,211,153,0.25);">✨</div>
             <div style="flex:1;min-width:0;">
-                <p style="font-weight:700;font-size:0.88rem;">Create Account</p>
-                <p style="font-size:0.7rem;color:var(--pb-muted2);margin-top:1px;">Register to participate</p>
+                <p style="font-weight:700;font-size:0.95rem;">Create Account</p>
+                <p style="font-size:0.78rem;color:var(--pb-muted2);margin-top:2px;">Register to participate</p>
             </div>
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--pb-muted2);flex-shrink:0;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
     </div>
 
