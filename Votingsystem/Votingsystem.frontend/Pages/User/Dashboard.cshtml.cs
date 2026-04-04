@@ -13,6 +13,7 @@ public class DashboardModel : PageModel
     public DashboardModel(AppDbContext db) => _db = db;
 
     public List<Election> AvailableElections { get; set; } = new();
+    public List<Election> VotedElections { get; set; } = new();
     public int VotesCount { get; set; }
 
     public async Task OnGetAsync()
@@ -28,6 +29,11 @@ public class DashboardModel : PageModel
 
         AvailableElections = await _db.Elections
             .Where(e => e.Status == "running" && !votedIds.Contains(e.Id))
+            .OrderByDescending(e => e.CreatedAt)
+            .ToListAsync();
+
+        VotedElections = await _db.Elections
+            .Where(e => votedIds.Contains(e.Id))
             .OrderByDescending(e => e.CreatedAt)
             .ToListAsync();
     }

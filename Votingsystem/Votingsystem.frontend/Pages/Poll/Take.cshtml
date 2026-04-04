@@ -48,16 +48,159 @@
             </a>
         </div>
     }
-    else if (Model.AlreadyVoted)
+    else if (Model.AlreadyVoted && Model.Election != null)
     {
-        <!-- Already voted state -->
-        <div class="pb-card p-8 text-center space-y-5">
-            <div style="font-size:3rem;">✅</div>
-            <div>
-                <h2 class="text-xl font-bold" style="color:var(--pb-text);">Already Voted</h2>
-                <p style="color:var(--pb-muted);margin-top:8px;">You've already submitted your vote for this election.</p>
+        <!-- Review mode — read-only view of user's submitted vote -->
+        <div class="pb-card p-6">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                        <span class="pb-badge pb-badge-success" style="font-size:0.72rem;">✓ Voted</span>
+                        <span class="pb-badge pb-badge-gold" style="font-size:0.72rem;">@Model.Election.Type.ToUpper()</span>
+                        <span style="font-size:0.75rem;color:var(--pb-muted2);">Review only — cannot be changed</span>
+                    </div>
+                    <h1 class="text-2xl font-bold" style="color:var(--pb-text);line-height:1.2;">@Model.Election.Title</h1>
+                    @if (!string.IsNullOrEmpty(Model.Election.Description))
+                    {
+                        <p style="color:var(--pb-muted);margin-top:8px;font-size:0.9rem;line-height:1.6;">@Model.Election.Description</p>
+                    }
+                </div>
+                <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                    Back
+                </a>
             </div>
-            <a asp-page="/User/Dashboard" class="pb-btn pb-btn-gold" style="display:inline-flex;">Back to Dashboard</a>
+        </div>
+
+        <div class="pb-card p-6 space-y-5">
+            <p style="font-size:0.82rem;color:var(--pb-muted2);font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">Your response</p>
+
+            @if (Model.Election.Type == "election")
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach (var c in Model.Election.Candidates)
+                    {
+                        var isSelected = Model.UserVote?.CandidateId == c.Id;
+                        <div style="position:relative;padding:16px;border-radius:14px;
+                                    border: 1.5px solid @(isSelected ? "var(--pb-gold)" : "var(--pb-border)");
+                                    background: @(isSelected ? "var(--pb-goldSubtle)" : "var(--pb-glass2)");
+                                    box-shadow: @(isSelected ? "0 0 0 2px rgba(212,175,55,0.25)" : "none");
+                                    opacity: @(isSelected ? "1" : "0.5");">
+                            @if (isSelected)
+                            {
+                                <div style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;
+                                            background:var(--pb-gold);display:flex;align-items:center;justify-content:center;">
+                                    <svg width="12" height="12" fill="none" stroke="#111" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(c.ImageUrl))
+                            {
+                                <img src="@c.ImageUrl" class="w-full object-cover rounded-xl mb-3"
+                                     style="height:160px;" onerror="this.style.display='none'" />
+                            }
+                            else
+                            {
+                                <div style="height:80px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                            display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:12px;">👤</div>
+                            }
+                            <h3 class="font-bold" style="color:var(--pb-text);font-size:1rem;">@c.Name</h3>
+                            @if (!string.IsNullOrEmpty(c.Description))
+                            {
+                                <p style="font-size:0.82rem;color:var(--pb-muted);margin-top:5px;line-height:1.5;">@c.Description</p>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            else if (Model.Election.Type == "rating")
+            {
+                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        var isSelected = Model.UserVote?.RatingValue == i;
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                            <div style="width:64px;height:64px;border-radius:18px;
+                                        display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+                                        background: @(isSelected ? "linear-gradient(135deg, var(--pb-gold), var(--pb-goldGlow))" : "var(--pb-glass2)");
+                                        border: 1.5px solid @(isSelected ? "var(--pb-gold)" : "var(--pb-border)");
+                                        box-shadow: @(isSelected ? "0 0 20px rgba(212,175,55,0.35)" : "none");
+                                        opacity: @(isSelected ? "1" : "0.4");
+                                        transform: @(isSelected ? "scale(1.1)" : "scale(1)");">
+                                @(i == 1 ? "😕" : i == 2 ? "😐" : i == 3 ? "🙂" : i == 4 ? "😊" : "🤩")
+                            </div>
+                            <span style="font-size:0.75rem;font-weight:700;color:@(isSelected ? "var(--pb-gold)" : "var(--pb-muted2)");">@i</span>
+                        </div>
+                    }
+                </div>
+                <p style="text-align:center;font-size:0.78rem;color:var(--pb-muted2);">1 = poor &nbsp; 5 = excellent</p>
+            }
+            else if (Model.Election.Type == "text")
+            {
+                <div style="padding:16px;border-radius:14px;background:var(--pb-glass2);border:1.5px solid var(--pb-goldBorder);">
+                    <p style="color:var(--pb-text);font-size:0.95rem;line-height:1.7;white-space:pre-wrap;">@(Model.UserVote?.TextResponse ?? "—")</p>
+                </div>
+            }
+            else if (Model.Election.Type == "multichoice")
+            {
+                var selectedIds = (Model.UserVote?.SelectedOptions ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s, out var n) ? n : 0)
+                    .ToHashSet();
+                <div class="space-y-3">
+                    @foreach (var opt in Model.Election.Options)
+                    {
+                        var isSelected = selectedIds.Contains(opt.Id);
+                        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;
+                                    border-radius:14px;
+                                    background: @(isSelected ? "var(--pb-goldSubtle)" : "var(--pb-glass2)");
+                                    border: 1.5px solid @(isSelected ? "var(--pb-goldBorder)" : "var(--pb-border)");
+                                    opacity: @(isSelected ? "1" : "0.5");">
+                            <div style="width:22px;height:22px;border-radius:7px;
+                                        border: 2px solid @(isSelected ? "var(--pb-gold)" : "var(--pb-border)");
+                                        background: @(isSelected ? "var(--pb-gold)" : "var(--pb-glass2)");
+                                        display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                @if (isSelected)
+                                {
+                                    <svg width="12" height="12" fill="none" stroke="#111" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                }
+                            </div>
+                            <span style="color:var(--pb-text);font-size:0.95rem;">@opt.Text</span>
+                        </div>
+                    }
+                </div>
+            }
+            else if (Model.Election.Type == "ranking")
+            {
+                var rankedIds = (Model.UserVote?.RankingOrder ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => int.TryParse(s, out var n) ? n : 0)
+                    .ToList();
+                var orderedOptions = rankedIds
+                    .Select(id => Model.Election.Options.FirstOrDefault(o => o.Id == id))
+                    .Where(o => o != null)
+                    .ToList();
+                // append any options not in the ranking (safety net)
+                orderedOptions.AddRange(Model.Election.Options.Where(o => !rankedIds.Contains(o.Id)));
+
+                <div class="space-y-2">
+                    @for (int i = 0; i < orderedOptions.Count; i++)
+                    {
+                        var opt = orderedOptions[i]!;
+                        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;
+                                    border-radius:14px;background:var(--pb-glass2);border:1.5px solid var(--pb-border);">
+                            <span style="color:var(--pb-gold);font-weight:800;font-size:1rem;min-width:28px;">@(i + 1).</span>
+                            <span style="color:var(--pb-text);flex:1;font-size:0.95rem;">@opt.Text</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="flex justify-end mt-4">
+            <a asp-page="/User/Dashboard" class="pb-btn pb-btn-gold">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Back to Dashboard
+            </a>
         </div>
     }
     else if (Model.Election != null)

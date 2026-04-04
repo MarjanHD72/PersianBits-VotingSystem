@@ -12,3 +12,13 @@ obj/
 # Rider / VS Code (optional but smart)
 .idea/
 .vscode/
+
+# macOS metadata
+.DS_Store
+
+# User-uploaded / seeder-downloaded files (regenerated at runtime)
+Votingsystem.frontend/wwwroot/uploads/
+
+# SQLite WAL files
+*.db-shm
+*.db-wal

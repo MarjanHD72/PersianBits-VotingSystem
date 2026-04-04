@@ -21,7 +21,7 @@ public class ResultsModel : PageModel
     public int TotalVotes { get; set; }
     public double AverageRating { get; set; }
 
-    public class CandidateResult { public string Name { get; set; } = ""; public int Votes { get; set; } public double Percentage { get; set; } }
+    public class CandidateResult { public string Name { get; set; } = ""; public string ImageUrl { get; set; } = ""; public int Votes { get; set; } public double Percentage { get; set; } }
     public class RatingResult { public int Stars { get; set; } public int Count { get; set; } public double Percentage { get; set; } }
     public class TextResult { public string UserName { get; set; } = ""; public string Text { get; set; } = ""; public DateTime SubmittedAt { get; set; } }
     public class OptionResult { public string Text { get; set; } = ""; public int Count { get; set; } public double Percentage { get; set; } }
@@ -45,6 +45,7 @@ public class ResultsModel : PageModel
                 .Select(c => new CandidateResult
                 {
                     Name = c.Name,
+                    ImageUrl = c.ImageUrl ?? "",
                     Votes = Election.Votes.Count(v => v.CandidateId == c.Id),
                     Percentage = TotalVotes > 0 ? Math.Round(Election.Votes.Count(v => v.CandidateId == c.Id) * 100.0 / TotalVotes, 1) : 0
                 }).OrderByDescending(c => c.Votes).ToList();

@@ -15,6 +15,7 @@ public class TakeModel : PageModel
 
     public Election? Election { get; set; }
     public bool AlreadyVoted { get; set; }
+    public Vote? UserVote { get; set; }
     public string? Error { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string? session)
@@ -27,10 +28,19 @@ public class TakeModel : PageModel
             .FirstOrDefaultAsync(e => e.SessionId == session.Trim().ToUpper());
 
         if (Election == null) { Error = "Election not found."; return Page(); }
-        if (Election.Status != "running") { Error = "This election is not currently active."; return Page(); }
 
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         AlreadyVoted = await _db.Votes.AnyAsync(v => v.ElectionId == Election.Id && v.UserId == userId);
+
+        if (AlreadyVoted)
+        {
+            UserVote = await _db.Votes
+                .Include(v => v.Candidate)
+                .FirstOrDefaultAsync(v => v.ElectionId == Election.Id && v.UserId == userId);
+            return Page();
+        }
+
+        if (Election.Status != "running") { Error = "This election is not currently active."; return Page(); }
 
         return Page();
     }
