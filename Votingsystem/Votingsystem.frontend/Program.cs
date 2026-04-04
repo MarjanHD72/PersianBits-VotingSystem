@@ -39,6 +39,17 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
+    db.Database.ExecuteSqlRaw(@"
+        CREATE TABLE IF NOT EXISTS Notifications (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            UserId INTEGER NOT NULL,
+            ElectionId INTEGER NOT NULL,
+            IsRead INTEGER NOT NULL DEFAULT 0,
+            CreatedAt TEXT NOT NULL,
+            FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+            FOREIGN KEY (ElectionId) REFERENCES Elections(Id) ON DELETE CASCADE
+        )
+    ");
     await DemoSeeder.SeedAsync(db, app.Environment);
 }
 

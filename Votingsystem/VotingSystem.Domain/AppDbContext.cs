@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Candidate> Candidates => Set<Candidate>();
     public DbSet<Option> Options => Set<Option>();
     public DbSet<Vote> Votes => Set<Vote>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -55,6 +56,19 @@ public class AppDbContext : DbContext
              .WithMany(c => c.Votes)
              .HasForeignKey(v => v.CandidateId)
              .IsRequired(false);
+        });
+
+        mb.Entity<Notification>(e =>
+        {
+            e.HasOne(n => n.User)
+             .WithMany()
+             .HasForeignKey(n => n.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(n => n.Election)
+             .WithMany()
+             .HasForeignKey(n => n.ElectionId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Seed a default admin

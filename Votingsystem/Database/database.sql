@@ -79,3 +79,17 @@ CREATE TABLE IF NOT EXISTS Votes (
 -- Enforces one vote per user per election at the database level
 CREATE UNIQUE INDEX IF NOT EXISTS IX_Votes_ElectionId_UserId
     ON Votes (ElectionId, UserId);
+
+-- ── Notifications ─────────────────────────────────────────────
+-- Created when an admin closes a poll. One row per voter per poll.
+-- IsRead is set to 1 when the user dismisses or views the result.
+CREATE TABLE IF NOT EXISTS Notifications (
+    Id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId     INTEGER NOT NULL,
+    ElectionId INTEGER NOT NULL,
+    IsRead     INTEGER NOT NULL DEFAULT 0,             -- 0 = unread, 1 = read
+    CreatedAt  TEXT    NOT NULL DEFAULT (datetime('now')),
+
+    FOREIGN KEY (UserId)     REFERENCES Users(Id)     ON DELETE CASCADE,
+    FOREIGN KEY (ElectionId) REFERENCES Elections(Id) ON DELETE CASCADE
+);
