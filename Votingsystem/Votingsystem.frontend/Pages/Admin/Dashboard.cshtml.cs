@@ -96,8 +96,28 @@ public class DashboardModel : PageModel
 
     public async Task<IActionResult> OnPostStopAsync(int id)
     {
-        var el = await _db.Elections.FindAsync(id);
-        if (el != null) { el.Status = "closed"; await _db.SaveChangesAsync(); }
+        var el = await _db.Elections
+            .Include(e => e.Votes)
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (el != null)
+        {
+            el.Status = "closed";
+
+            var now = DateTime.UtcNow;
+            foreach (var voterId in el.Votes.Select(v => v.UserId).Distinct())
+            {
+                _db.Notifications.Add(new VotingSystem.Domain.Notification
+                {
+                    UserId = voterId,
+                    ElectionId = id,
+                    IsRead = false,
+                    CreatedAt = now
+                });
+            }
+
+            await _db.SaveChangesAsync();
+        }
         return RedirectToPage();
     }
 

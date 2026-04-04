@@ -1,0 +1,262 @@
+@page
+@model Votingsystem.frontend.Pages.Poll.ResultsModel
+@{
+    ViewData["Title"] = Model.Election != null ? $"Results – {Model.Election.Title}" : "Results";
+    var session = HttpContext.Request.Query["session"].ToString();
+}
+
+<section class="max-w-4xl mx-auto space-y-6 px-2 sm:px-4">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+            <h1 class="text-2xl font-bold" style="color:var(--pb-text);">Results</h1>
+            @if (Model.Election != null)
+            {
+                <p style="color:var(--pb-muted);margin-top:4px;">@Model.Election.Title</p>
+            }
+        </div>
+        <a asp-page="/User/Dashboard" class="pb-btn pb-btn-outline text-sm" style="flex-shrink:0;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Dashboard
+        </a>
+    </div>
+
+    @if (Model.Election == null)
+    {
+        <div class="pb-card p-8 text-center space-y-4">
+            <div style="font-size:2.5rem;">🔍</div>
+            <p style="color:var(--pb-muted);">Election not found.</p>
+        </div>
+    }
+    else
+    {
+        <!-- Summary card -->
+        <div class="pb-card p-5">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div style="width:44px;height:44px;border-radius:14px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                            display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">
+                    @(Model.Election.Type switch { "election" => "🗳️", "rating" => "⭐", "text" => "📝", "multichoice" => "☑️", "ranking" => "🏆", _ => "📊" })
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span style="font-weight:700;color:var(--pb-text);font-size:1rem;">@Model.Election.Title</span>
+                        <span class="pb-badge pb-badge-gold" style="font-size:0.7rem;">@Model.Election.Type.ToUpper()</span>
+                        <span class="pb-badge pb-badge-danger" style="font-size:0.7rem;">Closed</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Election.Description))
+                    {
+                        <p style="font-size:0.82rem;color:var(--pb-muted2);margin-top:4px;">@Model.Election.Description</p>
+                    }
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <p style="font-size:1.4rem;font-weight:800;color:var(--pb-text);">@Model.TotalVotes</p>
+                    <p style="font-size:0.72rem;color:var(--pb-muted2);text-transform:uppercase;letter-spacing:0.06em;">Total Vote@(Model.TotalVotes == 1 ? "" : "s")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your vote reminder -->
+        <div style="background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);border-radius:16px;padding:14px 18px;
+                    display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.1rem;flex-shrink:0;">✓</span>
+            <div>
+                <p style="font-weight:700;color:var(--pb-gold);font-size:0.85rem;">You participated in this poll</p>
+                @if (Model.Election.Type == "election" && Model.UserVote?.Candidate != null)
+                {
+                    <p style="font-size:0.8rem;color:var(--pb-muted);margin-top:2px;">You voted for <strong style="color:var(--pb-text);">@Model.UserVote.Candidate.Name</strong></p>
+                }
+                else if (Model.Election.Type == "rating" && Model.UserVote?.RatingValue != null)
+                {
+                    <p style="font-size:0.8rem;color:var(--pb-muted);margin-top:2px;">You rated <strong style="color:var(--pb-text);">@Model.UserVote.RatingValue / 5</strong></p>
+                }
+                else if (Model.Election.Type == "text")
+                {
+                    <p style="font-size:0.8rem;color:var(--pb-muted);margin-top:2px;">You submitted a text response</p>
+                }
+                else
+                {
+                    <p style="font-size:0.8rem;color:var(--pb-muted);margin-top:2px;">Your response is included in the results below</p>
+                }
+            </div>
+        </div>
+
+        <!-- ── Results by type ───────────────────────────────────────────────── -->
+        @if (Model.Election.Type == "election")
+        {
+            if (Model.CandidateResults.Count == 0)
+            {
+                <div class="pb-card p-8 text-center">
+                    <div style="font-size:2rem;margin-bottom:10px;">🗳️</div>
+                    <p style="color:var(--pb-muted2);">No votes recorded.</p>
+                </div>
+            }
+            else
+            {
+                var winner = Model.CandidateResults[0];
+
+                <div class="pb-card p-6" style="border-color:var(--pb-goldBorder);background:var(--pb-goldSubtle);">
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                        @if (!string.IsNullOrEmpty(winner.ImageUrl))
+                        {
+                            <div style="position:relative;flex-shrink:0;">
+                                <img src="@winner.ImageUrl" alt="@winner.Name"
+                                     style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--pb-gold);box-shadow:0 0 16px rgba(212,175,55,0.4);"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                                <div style="display:none;width:80px;height:80px;border-radius:50%;background:var(--pb-goldSubtle);
+                                            border:3px solid var(--pb-gold);align-items:center;justify-content:center;font-size:2rem;">👤</div>
+                                <div style="position:absolute;bottom:-4px;right:-4px;background:var(--pb-gold);border-radius:50%;
+                                            width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;">👑</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="width:80px;height:80px;border-radius:50%;background:var(--pb-glass2);
+                                        border:3px solid var(--pb-gold);display:flex;align-items:center;
+                                        justify-content:center;font-size:2.5rem;flex-shrink:0;">👑</div>
+                        }
+                        <div style="flex:1;min-width:0;">
+                            <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pb-gold);margin-bottom:4px;">Winner</p>
+                            <p style="font-size:1.3rem;font-weight:800;color:var(--pb-text);">@winner.Name</p>
+                            <p style="font-size:0.85rem;color:var(--pb-muted);margin-top:2px;">@winner.Votes vote@(winner.Votes == 1 ? "" : "s") · @winner.Percentage% of total</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pb-card p-6 space-y-5">
+                    <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">All Candidates</h3>
+                    @for (int ci = 0; ci < Model.CandidateResults.Count; ci++)
+                    {
+                        var c       = Model.CandidateResults[ci];
+                        var numColor = ci == 0 ? "var(--pb-gold)" : "var(--pb-muted2)";
+                        var imgBdr  = ci == 0 ? "var(--pb-gold)" : "var(--pb-border)";
+                        var barDim  = ci == 0 ? "" : "filter:brightness(0.65);";
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+                                <span style="display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:0.85rem;font-weight:700;color:@numColor;min-width:20px;">@(ci+1).</span>
+                                    @if (!string.IsNullOrEmpty(c.ImageUrl))
+                                    {
+                                        <img src="@c.ImageUrl" alt="@c.Name"
+                                             style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid @imgBdr;flex-shrink:0;"
+                                             onerror="this.style.display='none'" />
+                                    }
+                                    else
+                                    {
+                                        <div style="width:36px;height:36px;border-radius:50%;background:var(--pb-glass2);
+                                                    border:2px solid @imgBdr;display:flex;align-items:center;
+                                                    justify-content:center;font-size:1rem;flex-shrink:0;">👤</div>
+                                    }
+                                    <span style="font-weight:600;color:var(--pb-text);font-size:0.95rem;">@c.Name</span>
+                                </span>
+                                <span style="color:var(--pb-muted2);font-size:0.82rem;">@c.Votes vote@(c.Votes == 1 ? "" : "s") · @c.Percentage%</span>
+                            </div>
+                            <div class="pb-progress" style="height:8px;">
+                                <div class="pb-progress-fill" style="width:@(c.Percentage)%;@barDim"></div>
+                            </div>
+                        </div>
+                    }
+                    <div style="border-top:1px solid var(--pb-border2);padding-top:14px;">
+                        <span style="color:var(--pb-muted2);font-size:0.82rem;">@Model.TotalVotes total votes</span>
+                    </div>
+                </div>
+            }
+        }
+        else if (Model.Election.Type == "rating")
+        {
+            <div class="pb-card p-6 space-y-5">
+                <div style="text-align:center;padding:12px 0 20px;border-bottom:1px solid var(--pb-border2);">
+                    <p style="font-size:4rem;font-weight:800;color:var(--pb-gold);line-height:1;">@Model.AverageRating</p>
+                    <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px;">
+                        @for (int s = 1; s <= 5; s++)
+                        {
+                            var starColor = s <= (int)Math.Round(Model.AverageRating) ? "var(--pb-gold)" : "var(--pb-muted2)";
+                            <span style="font-size:1.3rem;color:@starColor;">★</span>
+                        }
+                    </div>
+                    <p style="color:var(--pb-muted2);font-size:0.85rem;margin-top:8px;">Average from @Model.TotalVotes response@(Model.TotalVotes == 1 ? "" : "s")</p>
+                </div>
+                <div class="space-y-4">
+                    @foreach (var r in Model.RatingResults)
+                    {
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:0.875rem;">
+                                <span style="color:var(--pb-gold);font-size:1rem;">
+                                    @(new string('★', r.Stars))@(new string('☆', 5 - r.Stars))
+                                    <span style="color:var(--pb-muted2);font-size:0.78rem;margin-left:4px;">(@r.Stars)</span>
+                                </span>
+                                <span style="color:var(--pb-muted2);">@r.Count · @r.Percentage%</span>
+                            </div>
+                            <div class="pb-progress" style="height:7px;"><div class="pb-progress-fill" style="width:@(r.Percentage)%;"></div></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (Model.Election.Type == "text")
+        {
+            <div class="pb-card p-5">
+                <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">
+                    @Model.TextResponses.Count Response@(Model.TextResponses.Count == 1 ? "" : "s")
+                </h3>
+            </div>
+            foreach (var r in Model.TextResponses)
+            {
+                <div class="pb-card p-5 space-y-3">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="width:32px;height:32px;border-radius:10px;background:var(--pb-goldSubtle);border:1px solid var(--pb-goldBorder);
+                                        display:flex;align-items:center;justify-content:center;font-size:0.9rem;">💬</div>
+                            <span style="font-weight:700;color:var(--pb-text);font-size:0.9rem;">@r.UserName</span>
+                        </div>
+                        <span style="color:var(--pb-muted2);font-size:0.73rem;">@r.SubmittedAt.ToString("MMM dd, yyyy · HH:mm")</span>
+                    </div>
+                    <p style="color:var(--pb-muted);font-size:0.9rem;line-height:1.65;padding:12px 14px;border-radius:12px;
+                              background:var(--pb-glass2);border:1px solid var(--pb-border2);">@r.Text</p>
+                </div>
+            }
+        }
+        else if (Model.Election.Type == "multichoice")
+        {
+            <div class="pb-card p-6 space-y-5">
+                <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">Results — @Model.TotalVotes voter@(Model.TotalVotes == 1 ? "" : "s")</h3>
+                @for (int oi = 0; oi < Model.OptionResults.Count; oi++)
+                {
+                    var o      = Model.OptionResults[oi];
+                    var barDim = oi == 0 ? "" : "filter:brightness(0.65);";
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
+                            <span style="font-weight:600;color:var(--pb-text);font-size:0.95rem;">
+                                @if (oi == 0) { <text>★ </text> }
+                                @o.Text
+                            </span>
+                            <span style="color:var(--pb-muted2);font-size:0.82rem;">@o.Count selected · @o.Percentage%</span>
+                        </div>
+                        <div class="pb-progress" style="height:8px;"><div class="pb-progress-fill" style="width:@(o.Percentage)%;@barDim"></div></div>
+                    </div>
+                }
+            </div>
+        }
+        else if (Model.Election.Type == "ranking")
+        {
+            <div class="pb-card p-6 space-y-4">
+                <h3 style="font-size:0.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pb-muted2);">Ranked Results — @Model.TotalVotes voter@(Model.TotalVotes == 1 ? "" : "s")</h3>
+                @for (int ri = 0; ri < Model.RankingItemResults.Count; ri++)
+                {
+                    var r       = Model.RankingItemResults[ri];
+                    var rankBg  = ri == 0 ? "var(--pb-goldSubtle)" : "var(--pb-glass2)";
+                    var rankBdr = ri == 0 ? "var(--pb-goldBorder)" : "var(--pb-border2)";
+                    var rankCol = ri == 0 ? "var(--pb-gold)" : ri == 1 ? "#94a3b8" : "var(--pb-muted2)";
+                    <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:@rankBg;border:1px solid @rankBdr;">
+                        <span style="font-size:1.2rem;font-weight:800;color:@rankCol;min-width:28px;">@(ri+1).</span>
+                        <span style="font-weight:600;color:var(--pb-text);font-size:0.95rem;flex:1;">@r.Text</span>
+                        <div style="text-align:right;flex-shrink:0;">
+                            <span style="font-weight:700;color:var(--pb-text);font-size:0.9rem;">@r.Points</span>
+                            <span style="color:var(--pb-muted2);font-size:0.75rem;"> pts</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+
+</section>
