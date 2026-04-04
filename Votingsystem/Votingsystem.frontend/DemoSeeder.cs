@@ -146,6 +146,13 @@ public static class DemoSeeder
         var presCands   = candidates.Take(4).ToList();
         var projCands   = candidates.Skip(4).ToList();
 
+        // ── Weighted ballot maps for election-type polls ──────────────────
+        // Each array has 100 entries; the distribution determines vote share.
+        // President election: Alice 42 %, Raj 31 %, Chloe 18 %, Tobias 9 %
+        var presBallot = BuildWeightedBallot(new[] { 42, 31, 18, 9 });
+        // Best Project award: Team Alpha 48 %, Team Beta 33 %, Team Gamma 19 %
+        var projBallot = BuildWeightedBallot(new[] { 48, 33, 19 });
+
         // ── Votes — all 100 users participate ────────────────────────────
         var votes = new List<Vote>();
         var voters = users;
@@ -168,8 +175,8 @@ public static class DemoSeeder
         {
             var v = voters[i];
 
-            // Election 1 — Student Union President
-            votes.Add(new Vote { ElectionId = elPres.Id,    UserId = v.Id, CandidateId = presCands[i % presCands.Count].Id, SubmittedAt = now.AddDays(-20).AddHours(i) });
+            // Election 1 — Student Union President (weighted: Alice 42, Raj 31, Chloe 18, Tobias 9)
+            votes.Add(new Vote { ElectionId = elPres.Id,    UserId = v.Id, CandidateId = presCands[presBallot[i]].Id, SubmittedAt = now.AddDays(-20).AddHours(i) });
             // Election 2 — Multichoice
             var selected = string.Join(",", progOptions.Where((_, idx) => (i + idx) % 3 == 0).Select(o => o.Id.ToString()));
             if (string.IsNullOrEmpty(selected)) selected = progOptions[0].Id.ToString();
@@ -182,8 +189,8 @@ public static class DemoSeeder
             // Election 5 — Ranking (closed)
             var ranked = string.Join(",", facOptions.OrderBy(_ => (i * 7 + facOptions.IndexOf(_) * 3) % 11).Select(o => o.Id.ToString()));
             votes.Add(new Vote { ElectionId = elFac.Id,     UserId = v.Id, RankingOrder = ranked,       SubmittedAt = now.AddDays(-35).AddHours(i) });
-            // Election 6 — Best Project (closed)
-            votes.Add(new Vote { ElectionId = elProject.Id, UserId = v.Id, CandidateId = projCands[i % projCands.Count].Id, SubmittedAt = now.AddDays(-32).AddHours(i) });
+            // Election 6 — Best Project (closed, weighted: Alpha 48, Beta 33, Gamma 19)
+            votes.Add(new Vote { ElectionId = elProject.Id, UserId = v.Id, CandidateId = projCands[projBallot[i]].Id, SubmittedAt = now.AddDays(-32).AddHours(i) });
         }
 
         db.Votes.AddRange(votes);
@@ -240,6 +247,19 @@ public static class DemoSeeder
         new("Zara Ali",        "zara.ali@demo.com",        new DateTime(1999, 10, 15)),
         new("Marcus Johnson",  "marcus.johnson@demo.com",  new DateTime(2000, 2,   7)),
     ];
+
+    /// Builds a 100-element array where each candidate index appears exactly
+    /// weights[i] times. Gives a realistic vote distribution without randomness
+    /// so results are consistent on every seed run.
+    private static int[] BuildWeightedBallot(int[] weights)
+    {
+        var ballot = new int[100];
+        int pos = 0;
+        for (int ci = 0; ci < weights.Length; ci++)
+            for (int w = 0; w < weights[ci]; w++)
+                ballot[pos++] = ci;
+        return ballot;
+    }
 
     private record RandomUser(string Name, string Email, DateTime Dob);
 }
