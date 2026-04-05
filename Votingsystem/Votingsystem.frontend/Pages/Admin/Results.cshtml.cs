@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -37,6 +38,10 @@ public class ResultsModel : PageModel
             .FirstOrDefaultAsync(e => e.Id == id);
 
         if (Election == null) return RedirectToPage("/Admin/Dashboard");
+
+        var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        if (Election.CreatorId != currentUserId) return RedirectToPage("/Admin/Dashboard");
+
         TotalVotes = Election.Votes.Count;
 
         if (Election.Type == "election")

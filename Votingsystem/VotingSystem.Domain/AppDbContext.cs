@@ -56,6 +56,10 @@ public class AppDbContext : DbContext
              .WithMany(c => c.Votes)
              .HasForeignKey(v => v.CandidateId)
              .IsRequired(false);
+
+            // Enforce one vote per user per election at the database level.
+            // Matches the UNIQUE INDEX defined in Database/database.sql.
+            e.HasIndex(v => new { v.ElectionId, v.UserId }).IsUnique();
         });
 
         mb.Entity<Notification>(e =>

@@ -66,7 +66,7 @@ public class DashboardModel : PageModel
         // Votes per day for last 7 days
         var today = DateTime.UtcNow.Date;
         var allVotes = Elections.SelectMany(e => e.Votes).ToList();
-        VotesByDay = Enumerable.Range(6, 7)      // 6 days ago → today (index 6..12 → offset 6 down to 0)
+        VotesByDay = Enumerable.Range(0, 7)      // 6 days ago → today
             .Select(offset =>
             {
                 var day = today.AddDays(-(6 - offset));  // today-6 … today
@@ -89,16 +89,18 @@ public class DashboardModel : PageModel
 
     public async Task<IActionResult> OnPostStartAsync(int id)
     {
-        var el = await _db.Elections.FindAsync(id);
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var el = await _db.Elections.FirstOrDefaultAsync(e => e.Id == id && e.CreatorId == userId);
         if (el != null) { el.Status = "running"; await _db.SaveChangesAsync(); }
         return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostStopAsync(int id)
     {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var el = await _db.Elections
             .Include(e => e.Votes)
-            .FirstOrDefaultAsync(e => e.Id == id);
+            .FirstOrDefaultAsync(e => e.Id == id && e.CreatorId == userId);
 
         if (el != null)
         {
@@ -123,10 +125,12 @@ public class DashboardModel : PageModel
 
     public async Task<IActionResult> OnPostDeleteAsync(int id)
     {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var el = await _db.Elections
             .Include(e => e.Votes)
             .Include(e => e.Candidates)
-            .FirstOrDefaultAsync(e => e.Id == id);
+            .Include(e => e.Options)
+            .FirstOrDefaultAsync(e => e.Id == id && e.CreatorId == userId);
         if (el != null) { _db.Elections.Remove(el); await _db.SaveChangesAsync(); }
         return RedirectToPage();
     }
