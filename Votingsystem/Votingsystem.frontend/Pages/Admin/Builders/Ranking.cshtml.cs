@@ -21,6 +21,10 @@ public class RankingModel : PageModel
     public async Task<IActionResult> OnPostAsync()
     {
         if (string.IsNullOrWhiteSpace(Title)) { ModelState.AddModelError("", "Title is required."); return Page(); }
+
+        var validOptions = (OptionList ?? new()).Where(o => !string.IsNullOrWhiteSpace(o)).ToList();
+        if (validOptions.Count < 2) { ModelState.AddModelError("", "A ranking poll must have at least 2 options."); return Page(); }
+
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var election = new Election
         {
@@ -28,7 +32,7 @@ public class RankingModel : PageModel
             SessionId = SessionIdGenerator.Generate(), Type = "ranking",
             Status = "draft", CreatorId = userId
         };
-        foreach (var opt in (OptionList ?? new()).Where(o => !string.IsNullOrWhiteSpace(o)))
+        foreach (var opt in validOptions)
             election.Options.Add(new Option { Text = opt.Trim() });
         _db.Elections.Add(election);
         await _db.SaveChangesAsync();

@@ -139,7 +139,7 @@ Answer:";
     {
         return Results.Problem("Cannot connect to Ollama. Make sure it's running on port 11434. Error: " + ex.Message);
     }
-});
+}).RequireAuthorization();
 app.Run();
 public class ChatRequest
 {

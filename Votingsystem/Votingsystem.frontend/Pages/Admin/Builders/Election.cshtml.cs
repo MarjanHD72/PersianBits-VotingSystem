@@ -49,6 +49,12 @@ public class ElectionModel : PageModel
             .Where(c => !string.IsNullOrWhiteSpace(c.Name))
             .ToList();
 
+        if (validCandidates.Count < 2)
+        {
+            ModelState.AddModelError("", "An election must have at least 2 candidates.");
+            return Page();
+        }
+
         // Handle file uploads
         var files = Request.Form.Files;
         for (int i = 0; i < validCandidates.Count; i++)
