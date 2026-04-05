@@ -77,7 +77,7 @@ public class ResultsModel : PageModel
         }
         else if (Election.Type == "text")
         {
-            // Text responses are free-form — no tally needed, kept as-is
+            // Text responses are free-form — no tally needed.
             TextResponses = Election.Votes
                 .Where(v => v.TextResponse != null)
                 .OrderByDescending(v => v.SubmittedAt)

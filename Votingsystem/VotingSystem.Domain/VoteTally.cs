@@ -4,9 +4,16 @@ namespace VotingSystem.Domain;
 /// A fixed-slot scoring board that accumulates votes in a single O(n) pass.
 ///
 /// Internally backed by parallel arrays (scores[], labels[], imageUrls[]) and a
-/// slot-index dictionary so every Record call is O(1). The final ranked output
-/// is produced by a single Array.Sort — O(k log k) where k is the number of
-/// candidates or options, which is always small.
+/// custom open-addressing hash map (IntHashMap) as the slot-index so every Record
+/// call is O(1) average. The final ranked output is produced by a single
+/// Array.Sort — O(k log k) where k is the number of candidates or options, which
+/// is always small.
+///
+/// Record-call complexity by type:
+///   RecordSingleVote    – O(1): one hash-map lookup
+///   RecordRating        – O(1): one hash-map lookup
+///   RecordMultiChoice   – O(m): one lookup per selected option (m = selections per ballot)
+///   RecordBordaRanking  – O(k): one lookup per ranked position
 ///
 /// This replaces the scattered O(n·k) and O(n·k²) LINQ aggregations previously
 /// spread across Results.cshtml.cs, centralising all vote-counting logic here.
@@ -14,12 +21,12 @@ namespace VotingSystem.Domain;
 public sealed class VoteTally
 {
     // ── parallel arrays (one slot per candidate / option) ─────────────────────
-    private readonly int[]                _ids;
-    private readonly string[]             _labels;
-    private readonly string[]             _imageUrls;
-    private readonly int[]                _scores;
-    private readonly Dictionary<int, int> _slotIndex;   // entity ID → array index, O(1) lookup
-    private int                           _ballotCount;
+    private readonly int[]       _ids;
+    private readonly string[]    _labels;
+    private readonly string[]    _imageUrls;
+    private readonly int[]       _scores;
+    private readonly IntHashMap  _slotIndex;   // entity ID → array index, O(1) average lookup
+    private int                  _ballotCount;
 
     // ── construction ─────────────────────────────────────────────────────────
 
@@ -29,9 +36,9 @@ public sealed class VoteTally
         _labels    = labels;
         _imageUrls = imageUrls;
         _scores    = new int[ids.Length];
-        _slotIndex = new Dictionary<int, int>(ids.Length);
+        _slotIndex = new IntHashMap(ids.Length);
         for (int i = 0; i < ids.Length; i++)
-            _slotIndex[ids[i]] = i;
+            _slotIndex.Add(ids[i], i);
     }
 
     /// Tally keyed on candidates (carries name + optional photo).

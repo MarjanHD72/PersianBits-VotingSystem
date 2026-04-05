@@ -4,9 +4,11 @@ using Votingsystem.frontend;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// SQLite database
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlite("Data Source=votingsystem.db"));
+// SQLite database — connection string is read from appsettings.json ("ConnectionStrings:Default")
+// so the database file path can be changed without recompiling.
+var connectionString = builder.Configuration.GetConnectionString("Default")
+    ?? "Data Source=votingsystem.db";
+builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlite(connectionString));
 
 // Email service
 var emailService = new EmailService
