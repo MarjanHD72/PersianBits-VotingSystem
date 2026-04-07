@@ -5,9 +5,11 @@ namespace VotingSystem.Domain;
 
 public static class BCryptHelper
 {
-    // Simple hash + salt using HMACSHA256 — good enough for a coursework prototype.
-    // Format: salt:hash (both base64)
-
+/*
+ Simple password hashing using salt + HMACSHA256.
+ Stores data as (salt:hash) and verifies by re-hashing input password.
+ Uses secure comparison to prevent timing attacks.
+*/
     public static string Hash(string password)
     {
         var salt = new byte[16];
