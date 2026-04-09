@@ -22,6 +22,8 @@ Razor Pages, Entity Framework Core, and SQLite.
 
 ```
 PersianBits-VotingSystem/
+├── PersianBits_Report.pdf        # Full project report
+├── README.md
 ├── VotingSystem.Domain/          # Models, DbContext, helpers, VoteTally
 │   ├── IntHashMap.cs             # Custom open-addressing hash map (core data structure)
 │   ├── VoteTally.cs              # Vote aggregation engine — uses IntHashMap
@@ -30,16 +32,19 @@ PersianBits-VotingSystem/
 │   ├── Vote.cs
 │   ├── Candidate.cs
 │   ├── Option.cs
+│   ├── Notification.cs
 │   ├── AppDbContext.cs
 │   ├── BCryptHelper.cs
 │   ├── EmailService.cs
 │   └── SessionIdGenerator.cs
+├── VotingSystem.Application/     # Application layer
 ├── Votingsystem.frontend/        # Razor Pages application
 │   ├── Pages/
 │   │   ├── Admin/                # Dashboard, results, users, profile
 │   │   ├── Developer/            # User & role management
 │   │   ├── User/                 # Voter dashboard & profile
 │   │   ├── Poll/                 # Vote form & review
+│   │   ├── Join/                 # Session ID entry to join an election
 │   │   └── Auth/                 # Login & register
 │   ├── DemoSeeder.cs
 │   └── Program.cs
