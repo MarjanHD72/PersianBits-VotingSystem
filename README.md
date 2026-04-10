@@ -141,6 +141,26 @@ dotnet run
 
 Open `https://localhost:5001` in your browser. The database is created and seeded automatically on first run.
 
+
+## 🤖 AI Chat (Ollama + Phi-3)
+
+This project uses **Ollama** with the **Phi-3** model to power a local AI chat feature. 
+It runs entirely on your machine — no API keys or internet connection needed for the AI.
+
+### You need to do this before running the app:
+
+1. Download Ollama from https://ollama.com and install it
+2. Open your terminal and run:
+```bash
+   ollama pull phi3
+```
+3. Then start Ollama:
+```bash
+   ollama serve
+```
+> If Ollama isn't running, the AI chat just won't work But the rest of the app will be fine.
+
+
 ### Run unit tests
 
 ```bash
