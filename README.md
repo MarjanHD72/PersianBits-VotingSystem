@@ -22,6 +22,8 @@ Razor Pages, Entity Framework Core, and SQLite.
 
 ```
 PersianBits-VotingSystem/
+├── Database/
+│   └── database.sql        # SQL statements to create and seed the database
 ├── PersianBits_Report.pdf        # Full project report
 ├── README.md
 ├── VotingSystem.Domain/          # Models, DbContext, helpers, VoteTally
